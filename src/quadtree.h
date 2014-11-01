@@ -1,6 +1,8 @@
 #ifndef QUADTREE_H
 #define QUADTREE_H
 
+#include <glm/glm.hpp>
+
 class QuadTreeNode;
 
 class QuadTree

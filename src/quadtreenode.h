@@ -7,14 +7,16 @@
 struct AABB
 {
   glm::vec2 center;
-  glm::vec2 h_dim;
+  size_t edge_sz;
 
-  AABB(glm::vec2 c = glm::vec2(0, 0), glm::vec2 dim = glm::vec2(0, 0)) :
-    center(c), h_dim(dim)
+  AABB(glm::vec2 c = glm::vec2(0, 0), size_t edge = 1) :
+    center(c), edge_sz(edge)
   {}
 
   bool Intersect(AABB& rhs)
   {
+    glm::vec2 c = center - rhs.center;
+    if(glm::dot(c, c) <= pow(edge_sz + rhs.edge_sz, 2)) return true;
     return false;
   }
 };
@@ -25,12 +27,12 @@ public:
   QuadTreeNode(AABB box = AABB());
   virtual ~QuadTreeNode();
 
-  bool IsLeaf()
+  virtual bool IsLeaf()
   {
     return (!children[0] && !children[1] && !children[2] && !children[3]);
   }
 
-  void Split() {}
+  virtual void Split() {}
 
 private:
   AABB bbox;

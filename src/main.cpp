@@ -1,5 +1,6 @@
 #include <iostream>
 #include "quad.h"
+#include "quadtreenode.h"
 
 using std::cout;
 using std::endl;
@@ -11,7 +12,7 @@ void PrintQuad(Quad* q)
   cout << *q->x_mid() << ", " << *q->y_mid() << ", " << *q->z_mid() << endl;
 }
 
-int main()
+void TestOldQuad()
 {
   Quad* q = new Quad;
 
@@ -29,5 +30,25 @@ int main()
   cout << endl;
 
   delete q;
+}
+
+void TestAABB()
+{
+  AABB bbox1;
+  AABB bbox2;
+
+  cout << bbox1.Intersect(bbox2) << endl;
+  bbox2.center = glm::vec2(1, 0);
+  cout << bbox1.Intersect(bbox2) << endl;
+  bbox2.center = glm::vec2(2, 0);
+  cout << bbox1.Intersect(bbox2) << endl;
+  bbox2.center = glm::vec2(3, 9);
+  cout << bbox1.Intersect(bbox2) << endl;
+}
+
+int main()
+{
+  //TestOldQuad();
+  TestAABB();
   return 0;
 }
