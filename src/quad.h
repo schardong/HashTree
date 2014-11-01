@@ -24,9 +24,10 @@ public:
 	double *z_mid() { return &(*V)[v_mid_offset + 2]; }
 
 	Quad *quads[2][2];
+
 	Quad();
 	Quad(Quad &q);
-	~Quad();
+  virtual ~Quad();
 	Quad& operator=(Quad &q);
 
 	virtual void split();

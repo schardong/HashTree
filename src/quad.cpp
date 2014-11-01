@@ -1,4 +1,5 @@
 #include <cstdlib>
+#include <cstring>
 #include "quad.h"
 
 Quad::Quad() : V(new std::vector<double>)
@@ -40,9 +41,7 @@ Quad::Quad(Quad &q) : V(new std::vector<double>)
 Quad::~Quad()
 {
   if (is_split())
-  {
     delete quads;
-  }
 }
 
 Quad& Quad::operator=(Quad &q)

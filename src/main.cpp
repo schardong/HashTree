@@ -1,4 +1,10 @@
-#ifndef MAIN_CPP
-#define MAIN_CPP
+#include <iostream>
+#include "quad.h"
 
-#endif // MAIN_CPP
+int main()
+{
+  Quad* q = new Quad;
+
+  delete q;
+  return 0;
+}
