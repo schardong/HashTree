@@ -40,8 +40,12 @@ Quad::Quad(Quad &q) : V(new std::vector<double>)
 
 Quad::~Quad()
 {
-  if (is_split())
-    delete quads;
+  if (is_split()) {
+    delete quads[0][0];
+    delete quads[0][1];
+    delete quads[1][0];
+    delete quads[1][1];
+  }
 }
 
 Quad& Quad::operator=(Quad &q)
