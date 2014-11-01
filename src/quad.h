@@ -12,21 +12,21 @@ public:
 	unsigned int v_mid_offset;
 
 	double *x1() { return &(*V)[v1_offset + 0]; }
-	double *y1() { return &(*V)[v1_offset + 1]; }
-	double *z1() { return &(*V)[v1_offset + 2]; }
+  double *y1() { return &(*V)[v1_offset + 1]; }
+  double *z1() { return &(*V)[v1_offset + 2]; }
 
 	double *x2() { return &(*V)[v2_offset + 0]; }
-	double *y2() { return &(*V)[v2_offset + 1]; }
-	double *z2() { return &(*V)[v2_offset + 2]; }
+  double *y2() { return &(*V)[v2_offset + 1]; }
+  double *z2() { return &(*V)[v2_offset + 2]; }
 
 	double *x_mid() { return &(*V)[v_mid_offset + 0]; }
-	double *y_mid() { return &(*V)[v_mid_offset + 1]; }
-	double *z_mid() { return &(*V)[v_mid_offset + 2]; }
+  double *y_mid() { return &(*V)[v_mid_offset + 1]; }
+  double *z_mid() { return &(*V)[v_mid_offset + 2]; }
 
 	Quad *quads[2][2];
 
 	Quad();
-	Quad(Quad &q);
+  Quad(Quad &q);
   virtual ~Quad();
 	Quad& operator=(Quad &q);
 

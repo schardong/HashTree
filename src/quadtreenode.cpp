@@ -1,5 +1,9 @@
 #include "quadtreenode.h"
 
-QuadTreeNode::QuadTreeNode()
+QuadTreeNode::QuadTreeNode(AABB box) : bbox(box)
+{
+}
+
+QuadTreeNode::~QuadTreeNode()
 {
 }
