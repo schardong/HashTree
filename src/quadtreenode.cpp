@@ -64,25 +64,35 @@ void QuadTreeNode::Split()
   points.clear();
 }
 
-void QuadTreeNode::AddPoint(glm::vec2 p)
+int QuadTreeNode::AddPoint(glm::vec2 p)
 {
   if(!bbox->PointInBox(p))
-    return;
+    return -1;
 
   if(IsLeaf()) {
     if(points.size() < max_points) {
       points.push_back(p);
-      return;
+      return GetDepth();
     } else {
       Split();
     }
   }
 
+  int res_depth = GetDepth();
   for(size_t i = 0; i < 4; ++i) {
-
     if(children[i]->GetBBox()->PointInBox(p)) {
-      children[i]->AddPoint(p);
-      break;
+      int d = children[i]->AddPoint(p);
+      res_depth = d > res_depth? d : res_depth;
     }
   }
+
+  return res_depth;
+}
+
+std::vector<glm::vec2> QuadTreeNode::GetPointsInRange(AABB* range)
+{
+  using std::vector;
+  using glm::vec2;
+
+  vector<vec2> p_range;
 }

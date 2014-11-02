@@ -12,14 +12,25 @@ public:
 
   virtual void AddPoint(glm::vec2 p);
 
-  size_t GetMaxPoints()
+  size_t GetMaxPointsNode()
   {
     return max_points_node;
+  }
+
+  size_t GetNumPoints()
+  {
+    return num_points;
+  }
+
+  int GetDepth()
+  {
+    return depth;
   }
 
 private:
   size_t max_points_node;
   size_t num_points;
+  int depth;
   QuadTreeNode* root_node;
 };
 

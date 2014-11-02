@@ -45,7 +45,8 @@ public:
   }
 
   virtual void Split();
-  virtual void AddPoint(glm::vec2 p);
+  virtual int AddPoint(glm::vec2 p);
+  virtual std::vector<glm::vec2> GetPointsInRange(AABB* range);
 
   size_t GetNumPoints()
   {

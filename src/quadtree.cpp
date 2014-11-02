@@ -5,6 +5,7 @@ QuadTree::QuadTree(size_t num_points, AABB* bbox) : num_points(0)
 {
   root_node = new QuadTreeNode(num_points, bbox);
   max_points_node = num_points;
+  depth = 0;
 }
 
 QuadTree::~QuadTree()
@@ -16,6 +17,6 @@ QuadTree::~QuadTree()
 
 void QuadTree::AddPoint(glm::vec2 p)
 {
-  root_node->AddPoint(p);
+  depth = root_node->AddPoint(p);
   ++num_points;
 }
