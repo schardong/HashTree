@@ -1,9 +1,9 @@
 #include "quadtree.h"
 #include "quadtreenode.h"
 
-QuadTree::QuadTree()
+QuadTree::QuadTree(size_t num_points, AABB* bbox) : num_points(0)
 {
-  root_node = new QuadTreeNode;
+  root_node = new QuadTreeNode(num_points, bbox);
 }
 
 QuadTree::~QuadTree()
@@ -15,5 +15,6 @@ QuadTree::~QuadTree()
 
 void QuadTree::AddPoint(glm::vec2 p)
 {
-
+  root_node->AddPoint(p);
+  ++num_points;
 }

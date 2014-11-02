@@ -28,14 +28,13 @@ struct AABB
     bool y = (p.y >= bl_corner.y) && (p.y < bl_corner.y + edge_sz);
     return x && y;
   }
-
 };
 
 class QuadTreeNode
 {
 public:
   QuadTreeNode(size_t max_npoints = 64,
-               AABB* box = new AABB(),
+               AABB* box = new AABB,
                std::vector<glm::vec2> p = std::vector<glm::vec2>());
 
   virtual ~QuadTreeNode();

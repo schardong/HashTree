@@ -1,6 +1,5 @@
 #include <iostream>
-#include "quad.h"
-#include "quadtreenode.h"
+#include "quadtree.h"
 
 using std::cout;
 using std::endl;
@@ -9,14 +8,15 @@ void TestAABB();
 void TestPointInAABB();
 void TestQuadNodeSplit();
 void TestAddPoint();
-
+void TestQuadTree();
 
 int main()
 {
 //  TestAABB();
 //  TestPointInAABB();
 //  TestQuadNodeSplit();
-  TestAddPoint();
+//  TestAddPoint();
+  TestQuadTree();
   return 0;
 }
 
@@ -107,4 +107,16 @@ void TestAddPoint()
   qnode->AddPoint(vec2(0.13, 0.20));
 
   delete qnode;
+}
+
+void TestQuadTree()
+{
+  cout << "TEST QUADTREE.\n";
+  QuadTree* qtree = new QuadTree();
+
+  for(int i = 0; i < 128; i++) {
+    qtree->AddPoint(glm::vec2((double) i / 128.f + 0.001, 0.3));
+  }
+
+  delete qtree;
 }
