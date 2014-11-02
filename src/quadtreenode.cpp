@@ -1,3 +1,4 @@
+#include <cstring>
 #include "quadtreenode.h"
 
 static size_t g_quad_node_id = 0;
@@ -9,6 +10,7 @@ QuadTreeNode::QuadTreeNode(size_t max_npoints,
 {
   id = g_quad_node_id++;
   depth = 0;
+  memset(children, 0, sizeof(QuadTreeNode*) * 4);
 }
 
 QuadTreeNode::~QuadTreeNode()
@@ -77,6 +79,7 @@ void QuadTreeNode::AddPoint(glm::vec2 p)
   }
 
   for(size_t i = 0; i < 4; ++i) {
+
     if(children[i]->GetBBox()->PointInBox(p)) {
       children[i]->AddPoint(p);
       break;
