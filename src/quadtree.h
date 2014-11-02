@@ -14,7 +14,7 @@ public:
   virtual void AddPoint(glm::vec2 p);
 
 private:
-  const int maxPoints = 64;
+  size_t max_points;
   QuadTreeNode* root_node;
 };
 

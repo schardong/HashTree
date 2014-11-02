@@ -3,7 +3,7 @@
 
 QuadTree::QuadTree()
 {
-  root_node = new QuadTreeNode(AABB(glm::vec2(0, 0), 1));
+  root_node = new QuadTreeNode;
 }
 
 QuadTree::~QuadTree()
