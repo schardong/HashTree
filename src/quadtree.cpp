@@ -4,6 +4,7 @@
 QuadTree::QuadTree(size_t num_points, AABB* bbox) : num_points(0)
 {
   root_node = new QuadTreeNode(num_points, bbox);
+  max_points_node = num_points;
 }
 
 QuadTree::~QuadTree()
