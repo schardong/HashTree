@@ -112,7 +112,7 @@ void TestAddPoint()
 void TestQuadTree()
 {
   cout << "TEST QUADTREE.\n";
-  QuadTree* qtree = new QuadTree();
+  QuadTree* qtree = new QuadTree(16);
 
   for(int i = 0; i < 128; i++) {
     qtree->AddPoint(glm::vec2((double) i / 128.f + 0.001, 0.3));
