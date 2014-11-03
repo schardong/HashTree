@@ -11,6 +11,7 @@ public:
   virtual ~QuadTree();
 
   virtual void AddPoint(glm::vec2 p);
+  virtual std::vector<glm::vec2> GetPointsInRange(AABB bbox);
 
   size_t GetMaxPointsNode()
   {

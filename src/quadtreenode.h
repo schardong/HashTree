@@ -46,7 +46,7 @@ public:
 
   virtual void Split();
   virtual int AddPoint(glm::vec2 p);
-  virtual std::vector<glm::vec2> GetPointsInRange(AABB* range);
+  virtual std::vector<glm::vec2> GetPointsInRange(AABB range);
 
   size_t GetNumPoints()
   {
@@ -68,12 +68,23 @@ public:
     depth = d;
   }
 
+  QuadTreeNode* GetParent()
+  {
+    return parent;
+  }
+
+  void SetParent(QuadTreeNode* p)
+  {
+    parent = p;
+  }
+
 private:
   size_t id;
   size_t depth;
   size_t max_points;
   AABB* bbox;
   QuadTreeNode* children[4];
+  QuadTreeNode* parent;
   std::vector<glm::vec2> points;
 };
 

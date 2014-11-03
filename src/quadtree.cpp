@@ -20,3 +20,8 @@ void QuadTree::AddPoint(glm::vec2 p)
   depth = root_node->AddPoint(p);
   ++num_points;
 }
+
+std::vector<glm::vec2> QuadTree::GetPointsInRange(AABB bbox)
+{
+  return root_node->GetPointsInRange(bbox);
+}

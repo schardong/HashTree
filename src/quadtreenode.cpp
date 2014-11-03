@@ -10,6 +10,7 @@ QuadTreeNode::QuadTreeNode(size_t max_npoints,
 {
   id = g_quad_node_id++;
   depth = 0;
+  parent = nullptr;
   memset(children, 0, sizeof(QuadTreeNode*) * 4);
 }
 
@@ -26,6 +27,7 @@ QuadTreeNode::~QuadTreeNode()
 
   delete bbox;
   bbox = nullptr;
+  parent = nullptr;
 }
 
 void QuadTreeNode::Split()
@@ -59,6 +61,7 @@ void QuadTreeNode::Split()
   for(size_t i = 0; i < 4; ++i) {
     children[i] = new QuadTreeNode(max_points, bbox_quads[i], p_quads[i]);
     children[i]->SetDepth(GetDepth() + 1);
+    children[i]->SetParent(this);
   }
 
   points.clear();
@@ -89,10 +92,29 @@ int QuadTreeNode::AddPoint(glm::vec2 p)
   return res_depth;
 }
 
-std::vector<glm::vec2> QuadTreeNode::GetPointsInRange(AABB* range)
+std::vector<glm::vec2> QuadTreeNode::GetPointsInRange(AABB range)
 {
   using std::vector;
   using glm::vec2;
 
   vector<vec2> p_range;
+
+  if(!GetBBox()->Intersect(range))
+    return p_range;
+
+  if(IsLeaf()) {
+    for(auto it = points.begin(); it != points.end(); ++it)
+      if(bbox->PointInBox(*it) == true)
+        p_range.push_back(*it);
+  } else {
+    for(size_t i = 0; i < 4; ++i) {
+      vector<vec2> p = children[i]->GetPointsInRange(range);
+      if(!p.empty()) {
+        p_range.insert(p_range.end(), p.begin(), p.end());
+        p.clear();
+      }
+    }
+  }
+
+  return p_range;
 }

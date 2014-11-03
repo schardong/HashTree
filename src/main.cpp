@@ -1,4 +1,5 @@
 #include <iostream>
+#include <glm/glm.hpp>
 #include "quadtree.h"
 
 using std::cout;
@@ -9,6 +10,7 @@ void TestPointInAABB();
 void TestQuadNodeSplit();
 void TestAddPoint();
 void TestQuadTree();
+void TestGetPoints();
 
 int main()
 {
@@ -16,7 +18,8 @@ int main()
 //  TestPointInAABB();
 //  TestQuadNodeSplit();
 //  TestAddPoint();
-  TestQuadTree();
+//  TestQuadTree();
+  TestGetPoints();
   return 0;
 }
 
@@ -122,5 +125,26 @@ void TestQuadTree()
 
   cout << "  Tree depth = " << qtree->GetDepth() << endl;
   cout << "  Number of points = " << qtree->GetNumPoints() << endl;
+  delete qtree;
+}
+
+void TestGetPoints()
+{
+  cout << "Test get points in range.\n";
+
+  using std::vector;
+  using glm::vec2;
+  QuadTree* qtree = new QuadTree(4);
+  
+  qtree->AddPoint(vec2(0.25, 0.25));
+  qtree->AddPoint(vec2(0.75, 0.25));
+  qtree->AddPoint(vec2(0.75, 0.75));
+
+  vector<vec2> p1 = qtree->GetPointsInRange(AABB());
+  cout << p1.size() << " points in range.\n";
+
+  p1 = qtree->GetPointsInRange(AABB(vec2(0.01, 0.00), 0.4));
+  cout << p1.size() << " points in range.\n";
+
   delete qtree;
 }
