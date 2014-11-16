@@ -95,4 +95,22 @@ std::vector<glm::vec2> QuadTreeNode::GetPointsInRange(AABB* range)
   using glm::vec2;
 
   vector<vec2> p_range;
+
+  if(!range->Intersect(*GetBBox()))
+    return p_range;
+
+  if(IsLeaf()) {
+    for(auto it = points.begin(); it != points.end(); it++)
+      if(range->PointInBox(*it))
+        p_range.push_back(*it);
+    return p_range;
+  }
+
+  for(size_t i = 0; i < 4; ++i) {
+    vector<vec2> tmp = children[i]->GetPointsInRange(range);
+    if(!tmp.empty())
+      p_range.insert(p_range.end(), tmp.begin(), tmp.end());
+  }
+
+  return p_range;
 }

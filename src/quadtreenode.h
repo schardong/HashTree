@@ -13,20 +13,21 @@ struct AABB
     bl_corner(bl), edge_sz(edge)
   {}
 
-  bool Intersect(AABB& rhs)
-  {
-    glm::vec2 c = bl_corner - rhs.bl_corner;
-    size_t l = (edge_sz + rhs.edge_sz) * (edge_sz + rhs.edge_sz) / 4;
-
-    if(glm::dot(c, c) <= l) return true;
-    return false;
-  }
-
   bool PointInBox(glm::vec2 p)
   {
     bool x = (p.x >= bl_corner.x) && (p.x < bl_corner.x + edge_sz);
     bool y = (p.y >= bl_corner.y) && (p.y < bl_corner.y + edge_sz);
     return x && y;
+  }
+
+  bool Intersect(AABB& rhs)
+  {
+    return PointInBox(rhs.bl_corner) || rhs.PointInBox(bl_corner);
+//    glm::vec2 c = bl_corner - rhs.bl_corner;
+//    double l = (edge_sz + rhs.edge_sz) * (edge_sz + rhs.edge_sz) / 4.f;
+
+//    if(glm::dot(c, c) <= l) return true;
+//    return false;
   }
 };
 

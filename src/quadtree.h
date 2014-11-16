@@ -1,7 +1,9 @@
 #ifndef QUADTREE_H
 #define QUADTREE_H
 
+#include <vector>
 #include <glm/glm.hpp>
+
 #include "quadtreenode.h"
 
 class QuadTree
@@ -25,6 +27,11 @@ public:
   int GetDepth()
   {
     return depth;
+  }
+
+  std::vector<glm::vec2> GetPointsInRange(AABB* range)
+  {
+    return root_node->GetPointsInRange(range);
   }
 
 private:

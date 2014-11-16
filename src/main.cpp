@@ -9,14 +9,16 @@ void TestPointInAABB();
 void TestQuadNodeSplit();
 void TestAddPoint();
 void TestQuadTree();
+void TestGetPointsTree();
 
 int main()
 {
-//  TestAABB();
+  TestAABB();
 //  TestPointInAABB();
 //  TestQuadNodeSplit();
 //  TestAddPoint();
-  TestQuadTree();
+//  TestQuadTree();
+  TestGetPointsTree();
   return 0;
 }
 
@@ -27,16 +29,29 @@ void TestAABB()
   AABB bbox2;
 
   cout << bbox1.Intersect(bbox2) << endl;
+
   bbox2.bl_corner = glm::vec2(1, 0);
   cout << bbox1.Intersect(bbox2) << endl;
+
   bbox2.bl_corner = glm::vec2(2, 0);
   cout << bbox1.Intersect(bbox2) << endl;
+
   bbox2.bl_corner = glm::vec2(-1, 0);
   cout << bbox1.Intersect(bbox2) << endl;
+
   bbox2.bl_corner = glm::vec2(-2, 0);
   cout << bbox1.Intersect(bbox2) << endl;
+
   bbox2.edge_sz = 3;
   cout << bbox1.Intersect(bbox2) << endl;
+
+  bbox2.bl_corner = glm::vec2(-1, -1);
+  bbox2.edge_sz = 2;
+  cout << bbox1.Intersect(bbox2) << endl;
+
+  bbox2.bl_corner = glm::vec2(0, 0);
+  bbox2.edge_sz = 0.25;
+  cout << bbox2.Intersect(bbox1) << endl;
 }
 
 void TestPointInAABB()
@@ -119,6 +134,31 @@ void TestQuadTree()
       qtree->AddPoint(glm::vec2(i / 1024.f, j / 1024.f));
     }
   }
+
+  cout << "  Tree depth = " << qtree->GetDepth() << endl;
+  cout << "  Number of points = " << qtree->GetNumPoints() << endl;
+  delete qtree;
+}
+
+void TestGetPointsTree()
+{
+  using std::vector;
+  using glm::vec2;
+
+  cout << "Test GetPointsTree.\n";
+  QuadTree* qtree = new QuadTree(4);
+
+  for(int i = 0; i < 4; ++i) {
+    for(int j = 0; j < 4; ++j) {
+      qtree->AddPoint(vec2(i / 4.f, j / 4.f));
+    }
+  }
+
+  vector<vec2> points = qtree->GetPointsInRange(new AABB(vec2(0.0, 0.0), 0.51));
+
+  cout << "  Found " << points.size() << " points:\n";
+  for(auto it = points.begin(); it != points.end(); ++it)
+    cout << "    p = (" << it->x << ", " << it->y << ")" << endl;
 
   cout << "  Tree depth = " << qtree->GetDepth() << endl;
   cout << "  Number of points = " << qtree->GetNumPoints() << endl;
