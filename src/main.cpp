@@ -10,16 +10,16 @@ void TestPointInAABB();
 void TestQuadNodeSplit();
 void TestAddPoint();
 void TestQuadTree();
-void TestGetPoints();
+void TestGetPointsTree();
 
 int main()
 {
-//  TestAABB();
+  TestAABB();
 //  TestPointInAABB();
 //  TestQuadNodeSplit();
 //  TestAddPoint();
 //  TestQuadTree();
-  TestGetPoints();
+  TestGetPointsTree();
   return 0;
 }
 
@@ -30,16 +30,29 @@ void TestAABB()
   AABB bbox2;
 
   cout << bbox1.Intersect(bbox2) << endl;
+
   bbox2.bl_corner = glm::vec2(1, 0);
   cout << bbox1.Intersect(bbox2) << endl;
+
   bbox2.bl_corner = glm::vec2(2, 0);
   cout << bbox1.Intersect(bbox2) << endl;
+
   bbox2.bl_corner = glm::vec2(-1, 0);
   cout << bbox1.Intersect(bbox2) << endl;
+
   bbox2.bl_corner = glm::vec2(-2, 0);
   cout << bbox1.Intersect(bbox2) << endl;
+
   bbox2.edge_sz = 3;
   cout << bbox1.Intersect(bbox2) << endl;
+
+  bbox2.bl_corner = glm::vec2(-1, -1);
+  bbox2.edge_sz = 2;
+  cout << bbox1.Intersect(bbox2) << endl;
+
+  bbox2.bl_corner = glm::vec2(0, 0);
+  bbox2.edge_sz = 0.25;
+  cout << bbox2.Intersect(bbox1) << endl;
 }
 
 void TestPointInAABB()
@@ -128,23 +141,27 @@ void TestQuadTree()
   delete qtree;
 }
 
-void TestGetPoints()
+void TestGetPointsTree()
 {
-  cout << "Test get points in range.\n";
-
   using std::vector;
   using glm::vec2;
+
+  cout << "Test GetPointsTree.\n";
   QuadTree* qtree = new QuadTree(4);
-  
-  qtree->AddPoint(vec2(0.25, 0.25));
-  qtree->AddPoint(vec2(0.75, 0.25));
-  qtree->AddPoint(vec2(0.75, 0.75));
 
-  vector<vec2> p1 = qtree->GetPointsInRange(AABB());
-  cout << p1.size() << " points in range.\n";
+  for(int i = 0; i < 4; ++i) {
+    for(int j = 0; j < 4; ++j) {
+      qtree->AddPoint(vec2(i / 4.f, j / 4.f));
+    }
+  }
 
-  p1 = qtree->GetPointsInRange(AABB(vec2(0.01, 0.00), 0.4));
-  cout << p1.size() << " points in range.\n";
+  vector<vec2> points = qtree->GetPointsInRange(new AABB(vec2(0.0, 0.0), 0.51));
 
+  cout << "  Found " << points.size() << " points:\n";
+  for(auto it = points.begin(); it != points.end(); ++it)
+    cout << "    p = (" << it->x << ", " << it->y << ")" << endl;
+
+  cout << "  Tree depth = " << qtree->GetDepth() << endl;
+  cout << "  Number of points = " << qtree->GetNumPoints() << endl;
   delete qtree;
 }

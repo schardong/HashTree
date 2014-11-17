@@ -21,7 +21,7 @@ void QuadTree::AddPoint(glm::vec2 p)
   ++num_points;
 }
 
-std::vector<glm::vec2> QuadTree::GetPointsInRange(AABB bbox)
+std::vector<glm::vec2> QuadTree::GetPointsInRange(AABB* range)
 {
-  return root_node->GetPointsInRange(bbox);
+  return root_node->GetPointsInRange(range);
 }

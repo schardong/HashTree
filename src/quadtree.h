@@ -1,7 +1,9 @@
 #ifndef QUADTREE_H
 #define QUADTREE_H
 
+#include <vector>
 #include <glm/glm.hpp>
+
 #include "quadtreenode.h"
 
 class QuadTree
@@ -11,7 +13,7 @@ public:
   virtual ~QuadTree();
 
   virtual void AddPoint(glm::vec2 p);
-  virtual std::vector<glm::vec2> GetPointsInRange(AABB bbox);
+  virtual std::vector<glm::vec2> GetPointsInRange(AABB* range);
 
   size_t GetMaxPointsNode()
   {
