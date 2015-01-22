@@ -15,7 +15,7 @@ public:
 };
 
 ////////////////////
-class AABB : public BBox
+class AABBox : public BBox
 {
 public:
   AABB(glm::vec2 bl = glm::vec2(0, 0), double edge = 1.0) :
@@ -68,21 +68,33 @@ private:
 class Rhombus : public BBox
 {
 public:
-  Rhombus(std::array<glm::vec4, 4>& c);
+  Rhombus()
+  {
+    m_corners[0] = glm::vec2(0, 0);
+    m_corners[1] = glm::vec2(0, 0);
+    m_corners[2] = glm::vec2(0, 0);
+    m_corners[3] = glm::vec2(0, 0);
+  }
+
+  Rhombus(std::array<glm::vec2, 4>& c) :
+    m_corners(c)
+  {}
 
   bool PointInBox(glm::vec2 p)
   {
     using namespace glm;
-    bool a = dot(m_corners[1] - m_corners[0], p) > 0;
-    bool b = dot(m_corners[2] - m_corners[1], p) > 0;
-    bool c = dot(m_corners[3] - m_corners[2], p) > 0;
-    bool d = dot(m_corners[0] - m_corners[3], p) > 0;
-    return a && b && c && d;
+    if(p == m_corners[0] || p == m_corners[1] || p == m_corners[2] || p == m_corners[3])
+      return true;
+    bool a = dot(normalize(m_corners[1] - m_corners[0]), normalize(p - m_corners[0])) >= 0;
+    bool b = dot(normalize(m_corners[2] - m_corners[1]), normalize(p - m_corners[1])) >= 0;
+    bool c = dot(normalize(m_corners[3] - m_corners[2]), normalize(p - m_corners[2])) >= 0;
+    bool d = dot(normalize(m_corners[0] - m_corners[3]), normalize(p - m_corners[3])) >= 0;
+    return (a == b == c == d);
   }
 
   bool Intersect(BBox& rhs)
   {
-    return Intersect_p((Rhombus&)rhs);
+    return Intersect_p((Rhombus&)rhs) || rhs.Intersect((Rhombus&)*this);
   }
 
 private:
@@ -90,7 +102,11 @@ private:
 
   bool Intersect_p(Rhombus& rhs)
   {
-    return true;//PointInBox(rhs.bl_corner) || rhs.PointInBox(bl_corner);
+    bool a = PointInBox(rhs.m_corners[0]);
+    bool b = PointInBox(rhs.m_corners[1]);
+    bool c = PointInBox(rhs.m_corners[2]);
+    bool d = PointInBox(rhs.m_corners[3]);
+    return a || b || c || d;
   }
 };
 

@@ -3,10 +3,17 @@
 
 static size_t g_quad_node_id = 0;
 
-QuadTreeNode::QuadTreeNode(size_t max_npoints,
-                           AABB* box,
+QuadTreeNode::QuadTreeNode()
+{
+  max_points = 64;
+  box_type = AABB;
+}
+
+QuadTreeNode::QuadTreeNode(BBox* box,
+                           BBOX_TYPE t,
+                           size_t max_npoints,
                            std::vector<glm::vec2> p) :
-  bbox(box), points(p), max_points(max_npoints)
+  bbox(box), box_type(t), points(p), max_points(max_npoints)
 {
   id = g_quad_node_id++;
   depth = 0;
@@ -92,7 +99,7 @@ int QuadTreeNode::AddPoint(glm::vec2 p)
   return res_depth;
 }
 
-std::vector<glm::vec2> QuadTreeNode::GetPointsInRange(AABB* range)
+std::vector<glm::vec2> QuadTreeNode::GetPointsInRange(BBox* range)
 {
   using std::vector;
   using glm::vec2;
