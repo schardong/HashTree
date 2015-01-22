@@ -11,15 +11,17 @@ void TestQuadNodeSplit();
 void TestAddPoint();
 void TestQuadTree();
 void TestGetPointsTree();
+void TestRhombus();
 
 int main()
 {
-  TestAABB();
+  //TestAABB();
+  TestRhombus();
 //  TestPointInAABB();
 //  TestQuadNodeSplit();
 //  TestAddPoint();
 //  TestQuadTree();
-  TestGetPointsTree();
+  //TestGetPointsTree();
   return 0;
 }
 
@@ -31,27 +33,27 @@ void TestAABB()
 
   cout << bbox1.Intersect(bbox2) << endl;
 
-  bbox2.bl_corner = glm::vec2(1, 0);
+  bbox2.SetCorner(glm::vec2(1, 0));
   cout << bbox1.Intersect(bbox2) << endl;
 
-  bbox2.bl_corner = glm::vec2(2, 0);
+  bbox2.SetCorner(glm::vec2(2, 0));
   cout << bbox1.Intersect(bbox2) << endl;
 
-  bbox2.bl_corner = glm::vec2(-1, 0);
+  bbox2.SetCorner(glm::vec2(-1, 0));
   cout << bbox1.Intersect(bbox2) << endl;
 
-  bbox2.bl_corner = glm::vec2(-2, 0);
+  bbox2.SetCorner(glm::vec2(-2, 0));
   cout << bbox1.Intersect(bbox2) << endl;
 
-  bbox2.edge_sz = 3;
+  bbox2.SetEdgeSz(3);
   cout << bbox1.Intersect(bbox2) << endl;
 
-  bbox2.bl_corner = glm::vec2(-1, -1);
-  bbox2.edge_sz = 2;
+  bbox2.GetCorner() = glm::vec2(-1, -1);
+  bbox2.SetEdgeSz(2);
   cout << bbox1.Intersect(bbox2) << endl;
 
-  bbox2.bl_corner = glm::vec2(0, 0);
-  bbox2.edge_sz = 0.25;
+  bbox2.GetCorner() = glm::vec2(0, 0);
+  bbox2.SetEdgeSz(0.25);
   cout << bbox2.Intersect(bbox1) << endl;
 }
 
@@ -164,4 +166,11 @@ void TestGetPointsTree()
   cout << "  Tree depth = " << qtree->GetDepth() << endl;
   cout << "  Number of points = " << qtree->GetNumPoints() << endl;
   delete qtree;
+}
+
+void TestRhombus()
+{
+  Rhombus* r = new Rhombus;
+
+  delete r;
 }

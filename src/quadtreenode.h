@@ -1,35 +1,46 @@
 #ifndef QUADTREENODE_H
 #define QUADTREENODE_H
 
+#include "bbox.h"
 #include <vector>
 #include <glm/glm.hpp>
 
-struct AABB
-{
-  glm::vec2 bl_corner;
-  double edge_sz;
-
-  AABB(glm::vec2 bl = glm::vec2(0, 0), double edge = 1.0) :
-    bl_corner(bl), edge_sz(edge)
-  {}
-
-  bool PointInBox(glm::vec2 p)
-  {
-    bool x = (p.x >= bl_corner.x) && (p.x < bl_corner.x + edge_sz);
-    bool y = (p.y >= bl_corner.y) && (p.y < bl_corner.y + edge_sz);
-    return x && y;
-  }
-
-  bool Intersect(AABB& rhs)
-  {
-    return PointInBox(rhs.bl_corner) || rhs.PointInBox(bl_corner);
-//    glm::vec2 c = bl_corner - rhs.bl_corner;
-//    double l = (edge_sz + rhs.edge_sz) * (edge_sz + rhs.edge_sz) / 4.f;
-
-//    if(glm::dot(c, c) <= l) return true;
-//    return false;
-  }
-};
+//struct AABB
+//{
+//  glm::vec2 bl_corner;
+//  double edge_sz;
+//
+//  AABB(glm::vec2 bl = glm::vec2(0, 0), double edge = 1.0) :
+//    bl_corner(bl), edge_sz(edge)
+//  {}
+//
+//  bool PointInBox(glm::vec2 p)
+//  {
+//    bool x = (p.x >= bl_corner.x) && (p.x < bl_corner.x + edge_sz);
+//    bool y = (p.y >= bl_corner.y) && (p.y < bl_corner.y + edge_sz);
+//    return x && y;
+//  }
+//
+//  bool Intersect(AABB& rhs)
+//  {
+//    return PointInBox(rhs.bl_corner) || rhs.PointInBox(bl_corner);
+//  }
+//};
+//
+//struct Rhombus
+//{
+//  glm::vec2 m_corners[4];
+//
+//  bool PointInRhombus(glm::vec2 p)
+//  {
+//    using namespace glm;
+//    bool a = dot(m_corners[1] - m_corners[0], p) > 0;
+//    bool b = dot(m_corners[2] - m_corners[1], p) > 0;
+//    bool c = dot(m_corners[3] - m_corners[2], p) > 0;
+//    bool d = dot(m_corners[0] - m_corners[3], p) > 0;
+//    return a && b && c && d;
+//  }
+//};
 
 class QuadTreeNode
 {

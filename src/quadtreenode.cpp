@@ -40,11 +40,11 @@ void QuadTreeNode::Split()
 
   vector<vec2> p_quads[4];
   AABB* bbox_quads[4];
-  double e = bbox->edge_sz / 2;
-  double cx = bbox->bl_corner.x;
-  double cy = bbox->bl_corner.y;
+  double e = bbox->GetEdgeSz() / 2;
+  double cx = bbox->GetCorner().x;
+  double cy = bbox->GetCorner().y;
 
-  bbox_quads[0] = new AABB(bbox->bl_corner, e);
+  bbox_quads[0] = new AABB(bbox->GetCorner(), e);
   bbox_quads[1] = new AABB(vec2(cx + e, cy), e);
   bbox_quads[2] = new AABB(vec2(cx  + e, cy + e), e);
   bbox_quads[3] = new AABB(vec2(cx, cy + e), e);
