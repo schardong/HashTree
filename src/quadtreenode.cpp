@@ -40,21 +40,24 @@ QuadTreeNode::~QuadTreeNode()
 void QuadTreeNode::Split()
 {
   using std::vector;
+  using std::array;
   using glm::vec2;
 
   if(!IsLeaf() || points.size() < max_points)
     return;
 
   vector<vec2> p_quads[4];
-  AABB* bbox_quads[4];
-  double e = bbox->GetEdgeSz() / 2;
-  double cx = bbox->GetCorner().x;
-  double cy = bbox->GetCorner().y;
+  array<AABBox*, 4> bbox_quads;
+  AABBox* box = (AABBox*) bbox;
 
-  bbox_quads[0] = new AABB(bbox->GetCorner(), e);
-  bbox_quads[1] = new AABB(vec2(cx + e, cy), e);
-  bbox_quads[2] = new AABB(vec2(cx  + e, cy + e), e);
-  bbox_quads[3] = new AABB(vec2(cx, cy + e), e);
+  double e = box->GetEdgeSz() / 2;
+  double cx = box->GetCorner().x;
+  double cy = box->GetCorner().y;
+
+  bbox_quads[0] = new AABBox(box->GetCorner(), e);
+  bbox_quads[1] = new AABBox(vec2(cx + e, cy), e);
+  bbox_quads[2] = new AABBox(vec2(cx  + e, cy + e), e);
+  bbox_quads[3] = new AABBox(vec2(cx, cy + e), e);
 
   for(auto it = points.begin(); it != points.end(); ++it) {
     for(size_t i = 0; i < 4; ++i) {
@@ -66,7 +69,7 @@ void QuadTreeNode::Split()
   }
 
   for(size_t i = 0; i < 4; ++i) {
-    children[i] = new QuadTreeNode(max_points, bbox_quads[i], p_quads[i]);
+    children[i] = new QuadTreeNode(bbox_quads[i], box_type, max_points, p_quads[i]);
     children[i]->SetDepth(GetDepth() + 1);
     children[i]->SetParent(this);
   }

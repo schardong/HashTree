@@ -18,7 +18,7 @@ public:
 class AABBox : public BBox
 {
 public:
-  AABB(glm::vec2 bl = glm::vec2(0, 0), double edge = 1.0) :
+  AABBox(glm::vec2 bl = glm::vec2(0, 0), double edge = 1.0) :
     BBox(), bl_corner(bl), edge_sz(edge)
   {}
 
@@ -31,7 +31,7 @@ public:
 
   bool Intersect(BBox& rhs)
   {
-    return Intersect_p((AABB&)rhs);
+    return Intersect_p((AABBox&)rhs);
   }
 
   double GetEdgeSz()
@@ -58,7 +58,7 @@ private:
   glm::vec2 bl_corner;
   double edge_sz;
 
-  bool Intersect_p(AABB& rhs)
+  bool Intersect_p(AABBox& rhs)
   {
     return PointInBox(rhs.bl_corner) || rhs.PointInBox(bl_corner);
   }
