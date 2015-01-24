@@ -102,6 +102,13 @@ public:
     return Intersect_p((Rhombus&)rhs) || ((Rhombus&)rhs).Intersect_p(*this);
   }
 
+  glm::vec2 GetCorner(size_t i)
+  {
+    if(i < 0 || i > 3)
+      return m_corners[0];
+    return m_corners[i];
+  }
+
 private:
   std::array<glm::vec2 , 4> m_corners;
 
