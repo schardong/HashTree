@@ -7,7 +7,7 @@
 
 enum BBOX_TYPE
 {
-  AABB,
+  AXIS_ALIGNED,
   RHOMBUS
 };
 
@@ -17,7 +17,7 @@ public:
   QuadTreeNode();
 
   QuadTreeNode(BBox* box,
-               BBOX_TYPE t = AABB,
+               BBOX_TYPE t = AXIS_ALIGNED,
                size_t max_npoints = 64,
                std::vector<glm::vec2> p = std::vector<glm::vec2>());
 
@@ -71,6 +71,9 @@ private:
   QuadTreeNode* children[4];
   QuadTreeNode* parent;
   std::vector<glm::vec2> points;
+
+  void split_aabb();
+  void split_rhombus();
 };
 
 #endif // QUADTREENODE_H

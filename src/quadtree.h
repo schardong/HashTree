@@ -9,7 +9,7 @@
 class QuadTree
 {
 public:
-  QuadTree(size_t num_points = 64, AABB* bbox = new AABB);
+  QuadTree(BBox *bbox, BBOX_TYPE t = AXIS_ALIGNED, size_t num_points_node = 64);
   virtual ~QuadTree();
 
   virtual void AddPoint(glm::vec2 p);
@@ -22,7 +22,7 @@ public:
 
   size_t GetNumPoints()
   {
-    return num_points;
+    return m_num_points;
   }
 
   int GetDepth()
@@ -32,7 +32,7 @@ public:
 
 private:
   size_t max_points_node;
-  size_t num_points;
+  size_t m_num_points;
   int depth;
   QuadTreeNode* root_node;
 };

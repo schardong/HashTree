@@ -1,11 +1,12 @@
 #include "quadtree.h"
 #include "quadtreenode.h"
 
-QuadTree::QuadTree(size_t num_points, AABB* bbox) : num_points(0)
+QuadTree::QuadTree(BBox* bbox, BBOX_TYPE t, size_t num_points_node) :
+  m_num_points(0),
+  depth(0),
+  max_points_node(num_points_node)
 {
-  root_node = new QuadTreeNode(num_points, bbox);
-  max_points_node = num_points;
-  depth = 0;
+  root_node = new QuadTreeNode(bbox, t, num_points_node);
 }
 
 QuadTree::~QuadTree()
@@ -18,7 +19,7 @@ QuadTree::~QuadTree()
 void QuadTree::AddPoint(glm::vec2 p)
 {
   depth = root_node->AddPoint(p);
-  ++num_points;
+  ++m_num_points;
 }
 
 std::vector<glm::vec2> QuadTree::GetPointsInRange(AABB* range)

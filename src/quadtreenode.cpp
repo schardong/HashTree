@@ -6,7 +6,7 @@ static size_t g_quad_node_id = 0;
 QuadTreeNode::QuadTreeNode()
 {
   max_points = 64;
-  box_type = AABB;
+  box_type = AXIS_ALIGNED;
 }
 
 QuadTreeNode::QuadTreeNode(BBox* box,
@@ -39,39 +39,18 @@ QuadTreeNode::~QuadTreeNode()
 
 void QuadTreeNode::Split()
 {
-  using std::vector;
-  using std::array;
-  using glm::vec2;
 
   if(!IsLeaf() || points.size() < max_points)
     return;
 
-  vector<vec2> p_quads[4];
-  array<AABBox*, 4> bbox_quads;
-  AABBox* box = (AABBox*) bbox;
-
-  double e = box->GetEdgeSz() / 2;
-  double cx = box->GetCorner().x;
-  double cy = box->GetCorner().y;
-
-  bbox_quads[0] = new AABBox(box->GetCorner(), e);
-  bbox_quads[1] = new AABBox(vec2(cx + e, cy), e);
-  bbox_quads[2] = new AABBox(vec2(cx  + e, cy + e), e);
-  bbox_quads[3] = new AABBox(vec2(cx, cy + e), e);
-
-  for(auto it = points.begin(); it != points.end(); ++it) {
-    for(size_t i = 0; i < 4; ++i) {
-      if(bbox_quads[i]->PointInBox(*it)) {
-        p_quads[i].push_back(*it);
-        break;
-      }
-    }
-  }
-
-  for(size_t i = 0; i < 4; ++i) {
-    children[i] = new QuadTreeNode(bbox_quads[i], box_type, max_points, p_quads[i]);
-    children[i]->SetDepth(GetDepth() + 1);
-    children[i]->SetParent(this);
+  switch(box_type) {
+  case AXIS_ALIGNED:
+    split_aabb();
+    break;
+  case RHOMBUS:
+  default:
+    split_rhombus();
+    break;
   }
 
   points.clear();
@@ -126,4 +105,44 @@ std::vector<glm::vec2> QuadTreeNode::GetPointsInRange(BBox* range)
   }
 
   return p_range;
+}
+
+void QuadTreeNode::split_aabb()
+{
+  using std::vector;
+  using std::array;
+  using glm::vec2;
+
+  vector<vec2> p_quads[4];
+  array<AABB*, 4> bbox_quads;
+  AABB* box = (AABB*) bbox;
+
+  double e = box->GetEdgeSz() / 2;
+  double cx = box->GetCorner().x;
+  double cy = box->GetCorner().y;
+
+  bbox_quads[0] = new AABB(box->GetCorner(), e);
+  bbox_quads[1] = new AABB(vec2(cx + e, cy), e);
+  bbox_quads[2] = new AABB(vec2(cx  + e, cy + e), e);
+  bbox_quads[3] = new AABB(vec2(cx, cy + e), e);
+
+  for(auto it = points.begin(); it != points.end(); ++it) {
+    for(size_t i = 0; i < 4; ++i) {
+      if(bbox_quads[i]->PointInBox(*it)) {
+        p_quads[i].push_back(*it);
+        break;
+      }
+    }
+  }
+
+  for(size_t i = 0; i < 4; ++i) {
+    children[i] = new QuadTreeNode(bbox_quads[i], box_type, max_points, p_quads[i]);
+    children[i]->SetDepth(GetDepth() + 1);
+    children[i]->SetParent(this);
+  }
+}
+
+void QuadTreeNode::split_rhombus()
+{
+
 }

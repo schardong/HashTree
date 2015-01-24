@@ -15,10 +15,10 @@ public:
 };
 
 ////////////////////
-class AABBox : public BBox
+class AABB : public BBox
 {
 public:
-  AABBox(glm::vec2 bl = glm::vec2(0, 0), double edge = 1.0) :
+  AABB(glm::vec2 bl = glm::vec2(0, 0), double edge = 1.0) :
     BBox(), bl_corner(bl), edge_sz(edge)
   {}
 
@@ -31,7 +31,7 @@ public:
 
   bool Intersect(BBox& rhs)
   {
-    return Intersect_p((AABBox&)rhs);
+    return Intersect_p((AABB&)rhs);
   }
 
   double GetEdgeSz()
@@ -58,7 +58,7 @@ private:
   glm::vec2 bl_corner;
   double edge_sz;
 
-  bool Intersect_p(AABBox& rhs)
+  bool Intersect_p(AABB& rhs)
   {
     return PointInBox(rhs.bl_corner) || rhs.PointInBox(bl_corner);
   }
@@ -85,16 +85,21 @@ public:
     using namespace glm;
     if(p == m_corners[0] || p == m_corners[1] || p == m_corners[2] || p == m_corners[3])
       return true;
-    bool a = dot(normalize(m_corners[1] - m_corners[0]), normalize(p - m_corners[0])) >= 0;
-    bool b = dot(normalize(m_corners[2] - m_corners[1]), normalize(p - m_corners[1])) >= 0;
-    bool c = dot(normalize(m_corners[3] - m_corners[2]), normalize(p - m_corners[2])) >= 0;
-    bool d = dot(normalize(m_corners[0] - m_corners[3]), normalize(p - m_corners[3])) >= 0;
-    return (a == b == c == d);
+
+    for(int i = 1; i <= 4; ++i) {
+      vec2 v1 = normalize(m_corners[i % 4] - m_corners[(i - 1) % 4]);
+      vec2 v2 = normalize(p - m_corners[(i - 1) % 4]);
+
+      if(v2.x * v1.y > v2.y * v1.x)
+        return false;
+    }
+
+    return true;
   }
 
   bool Intersect(BBox& rhs)
   {
-    return Intersect_p((Rhombus&)rhs) || rhs.Intersect((Rhombus&)*this);
+    return Intersect_p((Rhombus&)rhs) || ((Rhombus&)rhs).Intersect_p(*this);
   }
 
 private:

@@ -24,6 +24,53 @@ int main()
   return 0;
 }
 
+void TestRhombus()
+{
+  using namespace glm;
+  array<vec2, 4> v1 = {vec2(0, 0), vec2(1, 0), vec2(1, 1), vec2(0, 1)};
+  array<vec2, 4> v2 = {vec2(3.5, 0.3), vec2(4, 0.3), vec2(4.5, 1.5), vec2(4.5, 1.5)};
+  Rhombus r1(v1);
+  Rhombus r2(v2);
+
+  cout << "Test Rhombus box.\n";
+
+  cout << r1.Intersect(r2) << endl;
+  cout << r2.Intersect(r1) << endl;
+}
+
+void TestPointInRhombus()
+{
+  using namespace glm;
+  cout << "Test Point in Rhombus box.\n";
+
+  array<vec2, 4> v1 = {vec2(0, 0), vec2(1, 0), vec2(2, 1), vec2(1, 1)};
+  Rhombus r1(v1);
+
+  vec2 p = vec2(0.5, 0.3);
+  cout << r1.PointInBox(p) << endl;
+
+  p = vec2(-0.1, 0.1);
+  cout << r1.PointInBox(p) << endl;
+
+  p = vec2(0, 0);
+  cout << r1.PointInBox(p) << endl;
+
+  p = vec2(0, 1);
+  cout << r1.PointInBox(p) << endl;
+
+  p = vec2(1, 0);
+  cout << r1.PointInBox(p) << endl;
+
+  p = vec2(1, 1);
+  cout << r1.PointInBox(p) << endl;
+
+  p = vec2(0.5, 0);
+  cout << r1.PointInBox(p) << endl;
+
+  p = vec2(0, 0.5);
+  cout << r1.PointInBox(p) << endl;
+}
+
 //void TestAABB()
 //{
 //  cout << "Test AABB.\n";
@@ -166,50 +213,3 @@ int main()
 //  cout << "  Number of points = " << qtree->GetNumPoints() << endl;
 //  delete qtree;
 //}
-
-void TestRhombus()
-{
-  using namespace glm;
-  array<vec2, 4> v1 = {vec2(0, 0), vec2(1, 0), vec2(1, 1), vec2(0, 1)};
-  array<vec2, 4> v2 = {vec2(3.5, 0.3), vec2(4, 0.3), vec2(4.5, 1.5), vec2(4.5, 1.5)};
-  Rhombus r1(v1);
-  Rhombus r2(v2);
-  
-  cout << "Test Rhombus box.\n";
-
-  cout << r1.Intersect(r2) << endl;
-  cout << r2.Intersect(r1) << endl;
-}
-
-void TestPointInRhombus()
-{
-  using namespace glm;
-  cout << "Test Point in Rhombus box.\n";
-  
-  array<vec2, 4> v1 = {vec2(0, 0), vec2(1, 0), vec2(1, 1), vec2(0, 1)};
-  Rhombus r1(v1);
-
-  vec2 p = vec2(0.5, 0.3);
-  cout << r1.PointInBox(p) << endl;
-
-  p = vec2(-0.1, 0.1);
-  cout << r1.PointInBox(p) << endl;
-
-  p = vec2(0, 0);
-  cout << r1.PointInBox(p) << endl;
-
-  p = vec2(0, 1);
-  cout << r1.PointInBox(p) << endl;
-
-  p = vec2(1, 0);
-  cout << r1.PointInBox(p) << endl;
-
-  p = vec2(1, 1);
-  cout << r1.PointInBox(p) << endl;
-
-  p = vec2(0.5, 0);
-  cout << r1.PointInBox(p) << endl;
-
-  p = vec2(0, 0.5);
-  cout << r1.PointInBox(p) << endl;
-}
