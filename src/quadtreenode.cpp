@@ -39,7 +39,6 @@ QuadTreeNode::~QuadTreeNode()
 
 void QuadTreeNode::Split()
 {
-
   if(!IsLeaf() || points.size() < max_points)
     return;
 

@@ -17,12 +17,14 @@ void TestGetPointsTree();
 void TestRhombus();
 void TestPointInRhombus();
 void TestQuadNodeRSplit();
+void TestGetPointsRhombusTree();
 
 int main()
 {
   TestRhombus();
   TestPointInRhombus();
   TestQuadNodeRSplit();
+  TestGetPointsRhombusTree();
   return 0;
 }
 
@@ -92,6 +94,65 @@ void TestQuadNodeRSplit()
   cout << "Number of points in the node: " << qnode->GetNumPoints() << "\tDepth: " << qnode->GetDepth() << endl;
   qnode->AddPoint(vec2(0.13, 0.20));
   cout << "Number of points in the node: " << qnode->GetNumPoints() << "\tDepth: " << qnode->GetDepth() << endl;
+
+  qnode->AddPoint(vec2(1.13, 0.20));
+  cout << "Number of points in the node: " << qnode->GetNumPoints() << "\tDepth: " << qnode->GetDepth() << endl;
+
+  qnode->AddPoint(vec2(1.2, 0.90));
+  cout << "Number of points in the node: " << qnode->GetNumPoints() << "\tDepth: " << qnode->GetDepth() << endl;
+
+  qnode->AddPoint(vec2(1.5, 0.70));
+  cout << "Number of points in the node: " << qnode->GetNumPoints() << "\tDepth: " << qnode->GetDepth() << endl;
+
+  qnode->AddPoint(vec2(1.0, 0.20));
+  cout << "Number of points in the node: " << qnode->GetNumPoints() << "\tDepth: " << qnode->GetDepth() << endl;
+
+  qnode->AddPoint(vec2(1.5, 0.80));
+  cout << "Number of points in the node: " << qnode->GetNumPoints() << "\tDepth: " << qnode->GetDepth() << endl;
+
+  delete qnode;
+}
+
+void TestGetPointsRhombusTree()
+{
+  cout << "Test get points in range.\n";
+  using glm::vec2;
+  using std::vector;
+  array<vec2, 4> v1 = {vec2(0, 0), vec2(1, 0), vec2(2, 1), vec2(1, 1)};
+  Rhombus* r1 = new Rhombus(v1);
+  QuadTreeNode* qnode = new QuadTreeNode(r1, RHOMBUS, 4);
+
+  cout << "Number of points in the node: " << qnode->GetNumPoints() << "\tDepth: " << qnode->GetDepth() << endl;
+  qnode->AddPoint(vec2(0.25, 0.25));
+  cout << "Number of points in the node: " << qnode->GetNumPoints() << "\tDepth: " << qnode->GetDepth() << endl;
+  qnode->AddPoint(vec2(0.75, 0.25));
+  cout << "Number of points in the node: " << qnode->GetNumPoints() << "\tDepth: " << qnode->GetDepth() << endl;
+  qnode->AddPoint(vec2(0.93, 0.95));
+  cout << "Number of points in the node: " << qnode->GetNumPoints() << "\tDepth: " << qnode->GetDepth() << endl;
+  qnode->AddPoint(vec2(0.03, 0.70));
+  cout << "Number of points in the node: " << qnode->GetNumPoints() << "\tDepth: " << qnode->GetDepth() << endl;
+  qnode->AddPoint(vec2(0.13, 0.20));
+  cout << "Number of points in the node: " << qnode->GetNumPoints() << "\tDepth: " << qnode->GetDepth() << endl;
+
+  qnode->AddPoint(vec2(1.13, 0.20));
+  cout << "Number of points in the node: " << qnode->GetNumPoints() << "\tDepth: " << qnode->GetDepth() << endl;
+
+  qnode->AddPoint(vec2(1.2, 0.90));
+  cout << "Number of points in the node: " << qnode->GetNumPoints() << "\tDepth: " << qnode->GetDepth() << endl;
+
+  qnode->AddPoint(vec2(1.5, 0.70));
+  cout << "Number of points in the node: " << qnode->GetNumPoints() << "\tDepth: " << qnode->GetDepth() << endl;
+
+  qnode->AddPoint(vec2(1.0, 0.20));
+  cout << "Number of points in the node: " << qnode->GetNumPoints() << "\tDepth: " << qnode->GetDepth() << endl;
+
+  qnode->AddPoint(vec2(1.5, 0.80));
+  cout << "Number of points in the node: " << qnode->GetNumPoints() << "\tDepth: " << qnode->GetDepth() << endl;
+
+  vector<vec2> p = qnode->GetPointsInRange(r1);
+  for(auto it = p.begin(); it != p.end(); ++it) {
+    cout << it->x << " " << it->y << endl;
+  }
 
   delete qnode;
 }
