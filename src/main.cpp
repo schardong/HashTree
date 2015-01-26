@@ -1,25 +1,67 @@
 #include <iostream>
 #include <glm/glm.hpp>
 #include <array>
+
 #include "quadtree.h"
 
+#include <GL/glut.h>
+ 
 using std::cout;
 using std::endl;
 using std::array;
+using glm::vec2;
 
-void TestRhombus();
-void TestPointInRhombus();
-void TestQuadNodeRSplit();
-void TestGetPointsRhombusTree();
-void TestQuadTreeRhombus();
+array<vec2, 4> v0 = {vec2(0, 0), vec2(1, 0), vec2(2, 1), vec2(1, 1)};
+Rhombus* r0;
 
-int main()
+void initGL()
 {
-//  TestRhombus();
-//  TestPointInRhombus();
-//  TestQuadNodeRSplit();
-//  TestGetPointsRhombusTree();
-  TestQuadTreeRhombus();
+  r0 = new Rhombus(v0);
+  glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+  glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+}
+ 
+void display()
+{
+  glClear(GL_COLOR_BUFFER_BIT);
+
+  glColor3f(1.f, 0.f, 0.f);
+
+  glBegin(GL_QUADS);
+  for(int i = 0; i < 4; ++i)
+    glVertex2f(v0[i].x, v0[i].y);
+  glEnd();
+
+  glFlush();
+}
+
+void reshape(GLsizei width, GLsizei height)
+{
+  if(height == 0)
+    height = 1;
+  GLfloat aspect = (GLfloat)width / (GLfloat)height;
+ 
+  glViewport(0, 0, width, height);
+
+  glMatrixMode(GL_PROJECTION);
+  glLoadIdentity();
+  if(width >= height) {
+    gluOrtho2D(-1.0 * aspect, 1.0 * aspect, -1.0, 1.0);
+  } else {
+    gluOrtho2D(-1.0, 1.0, -1.0 / aspect, 1.0 / aspect);
+  }
+}
+ 
+int main(int argc, char** argv)
+{
+  glutInit(&argc, argv);
+  glutInitWindowSize(640, 480);
+  glutInitWindowPosition(50, 50);
+  glutCreateWindow("Viewport Transform");
+  glutDisplayFunc(display);
+  glutReshapeFunc(reshape);
+  initGL();
+  glutMainLoop();
   return 0;
 }
 
@@ -160,10 +202,10 @@ void TestQuadTreeRhombus()
   cout << "Test rhombus quadtree structure.\n";
   array<vec2, 4> c0 = {vec2(0, 0), vec2(1, 0), vec2(2, 1), vec2(1, 1)};
   Rhombus* r0 = new Rhombus(c0);
-  QuadTree* qt = new QuadTree(r0, RHOMBUS, 4);
+  QuadTree* qt = new QuadTree(r0, RHOMBUS);
 
-  const int MAX_I = 4;
-  const int MAX_J = 4;
+  const int MAX_I = 1024;
+  const int MAX_J = 1024;
 
   for(int i = 0; i < MAX_I; ++i) {
     for(int j = 0; j < MAX_J; ++j) {
@@ -176,44 +218,3 @@ void TestQuadTreeRhombus()
 
   delete qt;
 }
-
-//void TestQuadTree()
-//{
-//  cout << "Test Quadtree.\n";
-//  QuadTree* qtree = new QuadTree(64);
-//
-//  for(int i = 0; i < 1024; ++i) {
-//    for(int j = 0; j < 1024; ++j) {
-//      qtree->AddPoint(glm::vec2(i / 1024.f, j / 1024.f));
-//    }
-//  }
-//
-//  cout << "  Tree depth = " << qtree->GetDepth() << endl;
-//  cout << "  Number of points = " << qtree->GetNumPoints() << endl;
-//  delete qtree;
-//}
-
-//void TestGetPointsTree()
-//{
-//  using std::vector;
-//  using glm::vec2;
-//
-//  cout << "Test GetPointsTree.\n";
-//  QuadTree* qtree = new QuadTree(4);
-//
-//  for(int i = 0; i < 4; ++i) {
-//    for(int j = 0; j < 4; ++j) {
-//      qtree->AddPoint(vec2(i / 4.f, j / 4.f));
-//    }
-//  }
-//
-//  vector<vec2> points = qtree->GetPointsInRange(new AABB(vec2(0.0, 0.0), 0.51));
-//
-//  cout << "  Found " << points.size() << " points:\n";
-//  for(auto it = points.begin(); it != points.end(); ++it)
-//    cout << "    p = (" << it->x << ", " << it->y << ")" << endl;
-//
-//  cout << "  Tree depth = " << qtree->GetDepth() << endl;
-//  cout << "  Number of points = " << qtree->GetNumPoints() << endl;
-//  delete qtree;
-//}
