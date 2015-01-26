@@ -16,13 +16,14 @@ QuadTree::~QuadTree()
   root_node = nullptr;
 }
 
-void QuadTree::AddPoint(glm::vec2 p)
+bool QuadTree::AddPoint(glm::vec2 p)
 {
   int r_depth = root_node->AddPoint(p);
   if(r_depth == -1)
-    return;
+    return false;
   depth = r_depth;
   ++m_num_points;
+  return true;
 }
 
 std::vector<glm::vec2> QuadTree::GetPointsInRange(BBox *range)

@@ -12,7 +12,7 @@ public:
   QuadTree(BBox *bbox, BBOX_TYPE t = AXIS_ALIGNED, size_t num_points_node = 64);
   virtual ~QuadTree();
 
-  virtual void AddPoint(glm::vec2 p);
+  virtual bool AddPoint(glm::vec2 p);
   virtual std::vector<glm::vec2> GetPointsInRange(BBox* range);
 
   size_t GetMaxPointsNode()

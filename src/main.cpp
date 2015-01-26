@@ -1,6 +1,7 @@
 #include <iostream>
 #include <glm/glm.hpp>
 #include <array>
+#include <vector>
 
 #include "quadtree.h"
 
@@ -9,16 +10,49 @@
 using std::cout;
 using std::endl;
 using std::array;
+using std::vector;
 using glm::vec2;
+using glm::vec3;
 
-array<vec2, 4> v0 = {vec2(0, 0), vec2(1, 0), vec2(2, 1), vec2(1, 1)};
 Rhombus* r0;
+QuadTree* qt;
+
+typedef struct point_t
+{
+  vec2 p;
+  vec3 c;
+} q_point;
+
+const int MAX_I = 32;
+const int MAX_J = 32;
+vector<q_point> points;
 
 void initGL()
 {
+  array<vec2, 4> v0 = {vec2(0, 0), vec2(1, 0), vec2(2, 1), vec2(1, 1)};
   r0 = new Rhombus(v0);
-  glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+  qt = new QuadTree(r0, RHOMBUS, 8);
+
+  for(int i = 0; i < MAX_I; ++i) {
+    for(int j = 0; j < MAX_J; ++j) {
+      q_point p;
+      p.p = vec2(i / (float)MAX_I, j / (float)MAX_J);
+
+      if(qt->AddPoint(p.p))
+        p.c = vec3(0, 1, 0);
+      else
+        p.c = vec3(1, 0, 0);
+
+      points.push_back(p);
+    }
+  }
+
+  glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
   glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+  glMatrixMode(GL_MODELVIEW);
+  glLoadIdentity();
+  glTranslatef(-1, -0.5, 0);
+  glPointSize(3);
 }
  
 void display()
@@ -27,9 +61,19 @@ void display()
 
   glColor3f(1.f, 0.f, 0.f);
 
+  glBegin(GL_POINTS);
+  for(int i = 0; i < MAX_I * MAX_J; ++i) {
+    glColor3f(points[i].c.x, points[i].c.y, points[i].c.z);
+    glVertex2f(points[i].p.x, points[i].p.y);
+  }
+  glEnd();
+
+  glColor3f(0, 0, 1);
   glBegin(GL_QUADS);
-  for(int i = 0; i < 4; ++i)
-    glVertex2f(v0[i].x, v0[i].y);
+    glVertex2f(r0->GetCorner(0).x, r0->GetCorner(0).y);
+    glVertex2f(r0->GetCorner(1).x, r0->GetCorner(1).y);
+    glVertex2f(r0->GetCorner(2).x, r0->GetCorner(2).y);
+    glVertex2f(r0->GetCorner(3).x, r0->GetCorner(3).y);
   glEnd();
 
   glFlush();
