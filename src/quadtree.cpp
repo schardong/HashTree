@@ -18,7 +18,10 @@ QuadTree::~QuadTree()
 
 void QuadTree::AddPoint(glm::vec2 p)
 {
-  depth = root_node->AddPoint(p);
+  int r_depth = root_node->AddPoint(p);
+  if(r_depth == -1)
+    return;
+  depth = r_depth;
   ++m_num_points;
 }
 

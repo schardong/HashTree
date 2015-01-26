@@ -160,15 +160,19 @@ void TestQuadTreeRhombus()
   cout << "Test rhombus quadtree structure.\n";
   array<vec2, 4> c0 = {vec2(0, 0), vec2(1, 0), vec2(2, 1), vec2(1, 1)};
   Rhombus* r0 = new Rhombus(c0);
-  QuadTree* qt = new QuadTree(r0, RHOMBUS);
+  QuadTree* qt = new QuadTree(r0, RHOMBUS, 4);
 
-  for(int i = 0; i < 1024; ++i) {
-    for(int j = 0; j < 1024; ++j) {
-      qt->AddPoint(glm::vec2((2 * i) / 1024.f, (2 * j) / 1024.f));
+  const int MAX_I = 4;
+  const int MAX_J = 4;
+
+  for(int i = 0; i < MAX_I; ++i) {
+    for(int j = 0; j < MAX_J; ++j) {
+      vec2 v = vec2((2.f * i) / (float) MAX_I, (2.f * j) / (float) MAX_J);
+      qt->AddPoint(v);
     }
   }
 
-  cout << qt->GetNumPoints() << "/" << 1024 * 1024 << " points added.\n";
+  cout << qt->GetNumPoints() << "/" << MAX_I * MAX_J << " points added.\n";
 
   delete qt;
 }
