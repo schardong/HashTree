@@ -62,26 +62,8 @@ public:
     parent = p;
   }
 
-  void draw()
-  {
-    switch(box_type) {
-    case AXIS_ALIGNED:
-    default:
-      draw_aabb();
-      break;
-    case RHOMBUS:
-      draw_rhombus();
-      break;
-    }
-
-    if(!IsLeaf()) {
-      children[0]->draw();
-      children[1]->draw();
-      children[2]->draw();
-      children[3]->draw();
-    }
-      
-  }
+  void draw();
+  void delEmptyLeaves();
 
 private:
   size_t id;

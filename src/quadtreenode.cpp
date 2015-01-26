@@ -205,3 +205,38 @@ void QuadTreeNode::draw_rhombus()
     glVertex2f(corners[3].x, corners[3].y);
   glEnd();
 }
+
+void QuadTreeNode::draw()
+{
+  switch(box_type) {
+  case AXIS_ALIGNED:
+  default:
+    draw_aabb();
+    break;
+  case RHOMBUS:
+    draw_rhombus();
+    break;
+  }
+
+  if(!IsLeaf())
+    for(int i = 0; i < 4; ++i)
+      if(children[i])
+        children[i]->draw();
+      
+}
+
+void QuadTreeNode::delEmptyLeaves()
+{
+  if(IsLeaf())
+    return;
+  for(int i = 0; i < 4; ++i) {
+    if(children[i]->IsLeaf()) {
+      if(children[i]->GetNumPoints() == 0) {
+        delete children[i];
+        children[i] = nullptr;
+      }
+    } else {
+      children[i]->delEmptyLeaves();
+    }
+  }
+}

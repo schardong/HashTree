@@ -36,7 +36,7 @@ void initGL()
   for(int i = 0; i < MAX_I; ++i) {
     for(int j = 0; j < MAX_J; ++j) {
       q_point p;
-      p.p = vec2(i / (float)MAX_I + 0.4, j / (float)MAX_J);
+      p.p = vec2(i / (float)MAX_I + 0.41, j / (float)MAX_J + 0.01);
 
       if(qt->AddPoint(p.p))
         p.c = vec3(0, 1, 0);
@@ -47,12 +47,14 @@ void initGL()
     }
   }
 
+  qt->delEmptyLeaves();
+
   glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
   glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();
   glTranslatef(-1, -0.5, 0);
-  glPointSize(2);
+  //glPointSize(2);
 }
  
 void display()

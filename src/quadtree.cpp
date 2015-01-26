@@ -30,3 +30,13 @@ std::vector<glm::vec2> QuadTree::GetPointsInRange(BBox *range)
 {
   return root_node->GetPointsInRange(range);
 }
+
+void QuadTree::draw()  
+{
+  root_node->draw();
+}
+
+void QuadTree::delEmptyLeaves()
+{
+  root_node->delEmptyLeaves();
+}
