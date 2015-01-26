@@ -7,24 +7,19 @@ using std::cout;
 using std::endl;
 using std::array;
 
-void TestAABB();
-void TestPointInAABB();
-void TestQuadNodeSplit();
-void TestAddPoint();
-void TestQuadTree();
-void TestGetPointsTree();
-
 void TestRhombus();
 void TestPointInRhombus();
 void TestQuadNodeRSplit();
 void TestGetPointsRhombusTree();
+void TestQuadTreeRhombus();
 
 int main()
 {
-  TestRhombus();
-  TestPointInRhombus();
-  TestQuadNodeRSplit();
-  TestGetPointsRhombusTree();
+//  TestRhombus();
+//  TestPointInRhombus();
+//  TestQuadNodeRSplit();
+//  TestGetPointsRhombusTree();
+  TestQuadTreeRhombus();
   return 0;
 }
 
@@ -157,107 +152,26 @@ void TestGetPointsRhombusTree()
   delete qnode;
 }
 
-//void TestAABB()
-//{
-//  cout << "Test AABB.\n";
-//  AABBox bbox1;
-//  AABBox bbox2;
-//
-//  cout << bbox1.Intersect(bbox2) << endl;
-//
-//  bbox2.SetCorner(glm::vec2(1, 0));
-//  cout << bbox1.Intersect(bbox2) << endl;
-//
-//  bbox2.SetCorner(glm::vec2(2, 0));
-//  cout << bbox1.Intersect(bbox2) << endl;
-//
-//  bbox2.SetCorner(glm::vec2(-1, 0));
-//  cout << bbox1.Intersect(bbox2) << endl;
-//
-//  bbox2.SetCorner(glm::vec2(-2, 0));
-//  cout << bbox1.Intersect(bbox2) << endl;
-//
-//  bbox2.SetEdgeSz(3);
-//  cout << bbox1.Intersect(bbox2) << endl;
-//
-//  bbox2.GetCorner() = glm::vec2(-1, -1);
-//  bbox2.SetEdgeSz(2);
-//  cout << bbox1.Intersect(bbox2) << endl;
-//
-//  bbox2.GetCorner() = glm::vec2(0, 0);
-//  bbox2.SetEdgeSz(0.25);
-//  cout << bbox2.Intersect(bbox1) << endl;
-//}
+void TestQuadTreeRhombus()
+{
+  using namespace glm;
+  using namespace std;
 
-//void TestPointInAABB()
-//{
-//  cout << "Test point in AABB.\n";
-//  AABBox bbox1;
-//
-//  glm::vec2 p(0.5, 0.5);
-//  cout << bbox1.PointInBox(p) << endl;
-//
-//  p = glm::vec2(0, 0);
-//  cout << bbox1.PointInBox(p) << endl;
-//
-//  p = glm::vec2(1, 0);
-//  cout << bbox1.PointInBox(p) << endl;
-//
-//  p = glm::vec2(0, 1);
-//  cout << bbox1.PointInBox(p) << endl;
-//
-//  p = glm::vec2(1, 1);
-//  cout << bbox1.PointInBox(p) << endl;
-//
-//  p = glm::vec2(0.2, -0.2);
-//  cout << bbox1.PointInBox(p) << endl;
-//
-//  p = glm::vec2(-0.2, -0.2);
-//  cout << bbox1.PointInBox(p) << endl;
-//
-//  p = glm::vec2(0.2, 0.2);
-//  cout << bbox1.PointInBox(p) << endl;
-//}
+  cout << "Test rhombus quadtree structure.\n";
+  array<vec2, 4> c0 = {vec2(0, 0), vec2(1, 0), vec2(2, 1), vec2(1, 1)};
+  Rhombus* r0 = new Rhombus(c0);
+  QuadTree* qt = new QuadTree(r0, RHOMBUS);
 
-//void TestQuadNodeSplit()
-//{
-//  cout << "Test Quad node split.\n";
-//
-//  using glm::vec2;
-//  QuadTreeNode* qnode = new QuadTreeNode(4);
-//
-//  qnode->AddPoint(vec2(0.25, 0.25));
-//  qnode->AddPoint(vec2(0.25, 0.35));
-//  qnode->AddPoint(vec2(0.25, 0.45));
-//
-//  qnode->AddPoint(vec2(0.75, 0.25));
-//  qnode->AddPoint(vec2(0.93, 0.45));
-//  qnode->AddPoint(vec2(0.63, 0.00));
-//  qnode->AddPoint(vec2(0.61, 0.05));
-//
-//  qnode->AddPoint(vec2(0.75, 0.75));
-//
-//  qnode->AddPoint(vec2(0.25, 0.75));
-//
-//  qnode->Split();
-//
-//  delete qnode;
-//}
+  for(int i = 0; i < 1024; ++i) {
+    for(int j = 0; j < 1024; ++j) {
+      qt->AddPoint(glm::vec2((2 * i) / 1024.f, (2 * j) / 1024.f));
+    }
+  }
 
-//void TestAddPoint()
-//{
-//  cout << "Test QuadNode add point.\n";
-//  using glm::vec2;
-//  QuadTreeNode* qnode = new QuadTreeNode(4);
-//
-//  qnode->AddPoint(vec2(0.25, 0.25));
-//  qnode->AddPoint(vec2(0.75, 0.25));
-//  qnode->AddPoint(vec2(0.93, 0.95));
-//  qnode->AddPoint(vec2(0.03, 0.70));
-//  qnode->AddPoint(vec2(0.13, 0.20));
-//
-//  delete qnode;
-//}
+  cout << qt->GetNumPoints() << "/" << 1024 * 1024 << " points added.\n";
+
+  delete qt;
+}
 
 //void TestQuadTree()
 //{
