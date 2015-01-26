@@ -29,14 +29,14 @@ vector<q_point> points;
 
 void initGL()
 {
-  array<vec2, 4> v0 = {vec2(0, 0), vec2(1, 0), vec2(2, 1), vec2(1, 1)};
+  array<vec2, 4> v0 = {vec2(0, 0), vec2(1, 0), vec2(1.5, 1), vec2(0.5, 1)};
   r0 = new Rhombus(v0);
-  qt = new QuadTree(r0, RHOMBUS, 8);
+  qt = new QuadTree(r0, RHOMBUS, 4);
 
   for(int i = 0; i < MAX_I; ++i) {
     for(int j = 0; j < MAX_J; ++j) {
       q_point p;
-      p.p = vec2(i / (float)MAX_I, j / (float)MAX_J);
+      p.p = vec2(i / (float)MAX_I + 0.4, j / (float)MAX_J);
 
       if(qt->AddPoint(p.p))
         p.c = vec3(0, 1, 0);
@@ -52,7 +52,7 @@ void initGL()
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();
   glTranslatef(-1, -0.5, 0);
-  glPointSize(3);
+  glPointSize(2);
 }
  
 void display()
@@ -69,12 +69,8 @@ void display()
   glEnd();
 
   glColor3f(0, 0, 1);
-  glBegin(GL_QUADS);
-    glVertex2f(r0->GetCorner(0).x, r0->GetCorner(0).y);
-    glVertex2f(r0->GetCorner(1).x, r0->GetCorner(1).y);
-    glVertex2f(r0->GetCorner(2).x, r0->GetCorner(2).y);
-    glVertex2f(r0->GetCorner(3).x, r0->GetCorner(3).y);
-  glEnd();
+
+  qt->draw();
 
   glFlush();
 }

@@ -1,4 +1,6 @@
 #include <cstring>
+#include <array>
+#include <gl/glut.h>
 #include "quadtreenode.h"
 
 static size_t g_quad_node_id = 0;
@@ -44,10 +46,10 @@ void QuadTreeNode::Split()
 
   switch(box_type) {
   case AXIS_ALIGNED:
+  default:
     split_aabb();
     break;
   case RHOMBUS:
-  default:
     split_rhombus();
     break;
   }
@@ -181,4 +183,25 @@ void QuadTreeNode::split_rhombus()
     children[i]->SetDepth(GetDepth() + 1);
     children[i]->SetParent(this);
   }
+}
+
+void QuadTreeNode::draw_aabb()
+{
+}
+
+void QuadTreeNode::draw_rhombus()
+{
+  Rhombus* box = (Rhombus*)bbox;
+
+  std::array<glm::vec2, 4> corners;
+
+  for(int i = 0; i < 4; ++i)
+    corners[i] = box->GetCorner(i);
+
+  glBegin(GL_QUADS);
+    glVertex2f(corners[0].x, corners[0].y);
+    glVertex2f(corners[1].x, corners[1].y);
+    glVertex2f(corners[2].x, corners[2].y);
+    glVertex2f(corners[3].x, corners[3].y);
+  glEnd();
 }

@@ -30,6 +30,11 @@ public:
     return depth;
   }
 
+  void draw()
+  {
+    root_node->draw();
+  }
+
 private:
   size_t max_points_node;
   size_t m_num_points;
