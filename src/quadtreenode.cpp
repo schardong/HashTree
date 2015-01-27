@@ -14,8 +14,9 @@ QuadTreeNode::QuadTreeNode()
 QuadTreeNode::QuadTreeNode(BBox* box,
                            BBOX_TYPE t,
                            size_t max_npoints,
+                           NODE_TYPE nt,
                            std::vector<glm::vec2> p) :
-  bbox(box), box_type(t), points(p), max_points(max_npoints)
+bbox(box), box_type(t), node_type(nt), points(p), max_points(max_npoints)
 {
   id = g_quad_node_id++;
   depth = 0;
@@ -137,7 +138,7 @@ void QuadTreeNode::split_aabb()
   }
 
   for(size_t i = 0; i < 4; ++i) {
-    children[i] = new QuadTreeNode(bbox_quads[i], box_type, max_points, p_quads[i]);
+    children[i] = new QuadTreeNode(bbox_quads[i], box_type, max_points, (NODE_TYPE)i, p_quads[i]);
     children[i]->SetDepth(GetDepth() + 1);
     children[i]->SetParent(this);
   }
@@ -179,7 +180,7 @@ void QuadTreeNode::split_rhombus()
   }
 
   for(size_t i = 0; i < 4; ++i) {
-    children[i] = new QuadTreeNode(bbox_quads[i], box_type, max_points, p_quads[i]);
+    children[i] = new QuadTreeNode(bbox_quads[i], box_type, max_points, (NODE_TYPE)i, p_quads[i]);
     children[i]->SetDepth(GetDepth() + 1);
     children[i]->SetParent(this);
   }
@@ -239,4 +240,9 @@ void QuadTreeNode::delEmptyLeaves()
       children[i]->delEmptyLeaves();
     }
   }
+}
+
+QuadTreeNode* QuadTreeNode::FindNeighbor(NBR_DIR dir)
+{
+
 }

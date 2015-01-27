@@ -11,6 +11,22 @@ enum BBOX_TYPE
   RHOMBUS
 };
 
+enum NODE_TYPE
+{
+  SW,
+  SE,
+  NE,
+  NW
+};
+
+enum NBR_DIR
+{
+  S,
+  E,
+  N,
+  W
+};
+
 class QuadTreeNode
 {
 public:
@@ -19,6 +35,7 @@ public:
   QuadTreeNode(BBox* box,
                BBOX_TYPE t = AXIS_ALIGNED,
                size_t max_npoints = 64,
+               NODE_TYPE nt = SW,
                std::vector<glm::vec2> p = std::vector<glm::vec2>());
 
   virtual ~QuadTreeNode();
@@ -62,6 +79,8 @@ public:
     parent = p;
   }
 
+  QuadTreeNode* FindNeighbor(NBR_DIR dir);
+
   void draw();
   void delEmptyLeaves();
 
@@ -71,6 +90,7 @@ private:
   size_t max_points;
   BBox* bbox;
   BBOX_TYPE box_type;
+  NODE_TYPE node_type;
   QuadTreeNode* children[4];
   QuadTreeNode* parent;
   std::vector<glm::vec2> points;
