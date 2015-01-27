@@ -244,5 +244,18 @@ void QuadTreeNode::delEmptyLeaves()
 
 QuadTreeNode* QuadTreeNode::FindNeighbor(NBR_DIR dir)
 {
-
+  switch(dir) {
+  case S:
+    break;
+  case E:
+    break;
+  case N:
+    if(node_type == NW || node_type == NE) {
+      //must find common ancestor.
+    } else {
+    }
+    break;
+  case W:
+    break;
+  }
 }
