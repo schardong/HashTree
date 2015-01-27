@@ -47,7 +47,7 @@ void initGL()
     }
   }
 
-  qt->delEmptyLeaves();
+  //qt->delEmptyLeaves();
 
   glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
   glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);

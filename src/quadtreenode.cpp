@@ -1,6 +1,6 @@
 #include <cstring>
 #include <array>
-#include <gl/glut.h>
+#include <GL/glut.h>
 #include "quadtreenode.h"
 
 static size_t g_quad_node_id = 0;
