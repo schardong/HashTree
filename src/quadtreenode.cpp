@@ -1,5 +1,6 @@
 #include <cstring>
 #include <array>
+#include <stack>
 #include <GL/glut.h>
 #include "quadtreenode.h"
 
@@ -162,13 +163,13 @@ void QuadTreeNode::split_rhombus()
 
   array<vec2, 4> v0 = {box->GetCorner(0), e0_midp, midd, e3_midp};
   array<vec2, 4> v1 = {e0_midp, box->GetCorner(1), e1_midp, midd};
-  array<vec2, 4> v2 = {midd, e1_midp, box->GetCorner(2), e2_midp};
-  array<vec2, 4> v3 = {e3_midp, midd, e2_midp, box->GetCorner(3)};
+  array<vec2, 4> v2 = {e3_midp, midd, e2_midp, box->GetCorner(3)};
+  array<vec2, 4> v3 = {midd, e1_midp, box->GetCorner(2), e2_midp};
 
-  bbox_quads[0] = new Rhombus(v0);
-  bbox_quads[1] = new Rhombus(v1);
-  bbox_quads[2] = new Rhombus(v2);
-  bbox_quads[3] = new Rhombus(v3);
+  bbox_quads[SW] = new Rhombus(v0);
+  bbox_quads[SE] = new Rhombus(v1);
+  bbox_quads[NW] = new Rhombus(v2);
+  bbox_quads[NE] = new Rhombus(v3);
 
   for(auto it = points.begin(); it != points.end(); ++it) {
     for(size_t i = 0; i < 4; ++i) {
@@ -188,6 +189,7 @@ void QuadTreeNode::split_rhombus()
 
 void QuadTreeNode::draw_aabb()
 {
+  //TODO: Something
 }
 
 void QuadTreeNode::draw_rhombus()
@@ -223,7 +225,7 @@ void QuadTreeNode::draw()
     for(int i = 0; i < 4; ++i)
       if(children[i])
         children[i]->draw();
-      
+
 }
 
 void QuadTreeNode::delEmptyLeaves()
@@ -244,15 +246,47 @@ void QuadTreeNode::delEmptyLeaves()
 
 QuadTreeNode* QuadTreeNode::FindNeighbor(NBR_DIR dir)
 {
+  using namespace std;
+
+  if(!IsLeaf() || node_type == ROOT)
+    return nullptr;
+
   switch(dir) {
   case S:
     break;
   case E:
     break;
   case N:
-    if(node_type == NW || node_type == NE) {
-      //must find common ancestor.
+    if(node_type >> 1 == 1) { //NORTH-SOMETHING
+      stack<NODE_TYPE> sdir;
+      QuadTreeNode* curr_node = this;
+
+      //Find common ancestor.
+      do {
+        sdir.push(curr_node->GetNodeType());
+        curr_node = GetParent();
+      } while(curr_node->GetNodeType() >> 1 != 0 || curr_node->GetParent() != nullptr);
+
+      //curr_node is the common ancestor.
+      //Must backtrack now.
+      do {
+        int walk_dir = (int)sdir.top();
+        sdir.pop();
+
+        walk_dir ^= 1 << 2;
+        if(curr_node->GetChild(walk_dir) == nullptr)
+          break;
+        curr_node = curr_node->GetChild(walk_dir);
+
+      } while(!sdir.empty());
+
+      //OK, found the node, returning it.
+      return curr_node;
+
     } else {
+      if(node_type == SE)
+        return parent->GetChild(NE);
+      return parent->GetChild(NW);
     }
     break;
   case W:

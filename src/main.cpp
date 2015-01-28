@@ -6,7 +6,7 @@
 #include "quadtree.h"
 
 #include <GL/glut.h>
- 
+
 using std::cout;
 using std::endl;
 using std::array;
@@ -33,13 +33,19 @@ void initGL()
   Rhombus* r0 = new Rhombus(v0);
   qt = new QuadTree(r0, RHOMBUS, 2);
 
+  qt->GetRoot()->FindNeighbor(N);
+  qt->AddPoint(vec2(0.3, 0.3));
+  qt->AddPoint(vec2(0.3, 0.7));
+  qt->AddPoint(vec2(0.4, 0.7));
+  QuadTreeNode* test_node = qt->GetRoot()->GetChild(0)->FindNeighbor(N);
+
   glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
   glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();
   glPointSize(2);
 }
- 
+
 void display()
 {
   glClear(GL_COLOR_BUFFER_BIT);

@@ -15,8 +15,9 @@ enum NODE_TYPE
 {
   SW,
   SE,
+  NW,
   NE,
-  NW
+  ROOT = 4
 };
 
 enum NBR_DIR
@@ -35,7 +36,7 @@ public:
   QuadTreeNode(BBox* box,
                BBOX_TYPE t = AXIS_ALIGNED,
                size_t max_npoints = 64,
-               NODE_TYPE nt = SW,
+               NODE_TYPE nt = ROOT,
                std::vector<glm::vec2> p = std::vector<glm::vec2>());
 
   virtual ~QuadTreeNode();
@@ -77,6 +78,17 @@ public:
   void SetParent(QuadTreeNode* p)
   {
     parent = p;
+  }
+
+  QuadTreeNode* GetChild(int idx)
+  {
+    assert(idx >= 0 && idx <= 3);
+    return children[idx];
+  }
+
+  NODE_TYPE GetNodeType()
+  {
+    return node_type;
   }
 
   QuadTreeNode* FindNeighbor(NBR_DIR dir);

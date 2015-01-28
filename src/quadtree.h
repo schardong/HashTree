@@ -30,6 +30,11 @@ public:
     return depth;
   }
 
+  QuadTreeNode* GetRoot()
+  {
+    return root_node;
+  }
+  
   void draw();
   void delEmptyLeaves();
 
