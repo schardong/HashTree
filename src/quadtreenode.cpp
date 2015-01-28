@@ -265,7 +265,9 @@ QuadTreeNode* QuadTreeNode::FindNeighbor(NBR_DIR dir)
       do {
         sdir.push(curr_node->GetNodeType());
         curr_node = GetParent();
-      } while(curr_node->GetNodeType() >> 1 != 0 || curr_node->GetParent() != nullptr);
+        if(curr_node->id == 0)
+          return nullptr;
+      } while(curr_node->GetNodeType() >> 1 != 0);
 
       //curr_node is the common ancestor.
       //Must backtrack now.
@@ -273,7 +275,7 @@ QuadTreeNode* QuadTreeNode::FindNeighbor(NBR_DIR dir)
         int walk_dir = (int)sdir.top();
         sdir.pop();
 
-        walk_dir ^= 1 << 2;
+        walk_dir ^= 1 << 1;
         if(curr_node->GetChild(walk_dir) == nullptr)
           break;
         curr_node = curr_node->GetChild(walk_dir);
