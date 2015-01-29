@@ -181,7 +181,7 @@ void QuadTreeNode::split_rhombus()
     }
   }
 
-  for(size_t i = 0; i < 4; ++i) {
+  for(int i = 0; i < 4; ++i) {
     children[i] = new QuadTreeNode(bbox_quads[i], box_type, max_points, (NODE_TYPE)i, p_quads[i]);
     children[i]->SetDepth(GetDepth() + 1);
     children[i]->SetParent(this);
@@ -273,27 +273,30 @@ QuadTreeNode *QuadTreeNode::north_nbr(QuadTreeNode* node)
   if(node->GetParent() == nullptr) //We arrived at the root.
     return nullptr;
 
-  if(node_type >> 1 == 0) //SOUTH-(WEST/EAST) node
-    return (node_type == SE ? parent->GetChild(NE) : parent->GetChild(NW));
+  if(node->GetNodeType() >> 1 == 0) //SOUTH-(WEST/EAST) node
+    return ((node->GetNodeType() == SE) ? node->GetParent()->GetChild(NE) : node->GetParent()->GetChild(NW));
 
   QuadTreeNode* tmp = north_nbr(node->GetParent());
   if(tmp == nullptr || tmp->IsLeaf())
     return tmp;
 
-  return (node_type == NW ? tmp->GetChild(SW) : tmp->GetChild(SE));
+  return ((node->GetNodeType() == NW) ? tmp->GetChild(SW) : tmp->GetChild(SE));
 }
 
 QuadTreeNode *QuadTreeNode::south_nbr(QuadTreeNode *node)
 {
+  using namespace std;
+//  cout << node->GetId() << endl;
   if(node->GetParent() == nullptr) //We arrived at the root.
     return nullptr;
 
-  if(node_type >> 1 == 1) //NORTH-(WEST/EAST) node
-    return (node_type == NE ? parent->GetChild(SE) : parent->GetChild(SW));
+  if(node->GetNodeType() >> 1 == 1) {//NORTH-(WEST/EAST) node
+    return (node->GetNodeType() == NE ? node->GetParent()->GetChild(SE) : node->GetParent()->GetChild(SW));
+  }
 
   QuadTreeNode* tmp = south_nbr(node->GetParent());
   if(tmp == nullptr || tmp->IsLeaf())
     return tmp;
 
-  return (node_type == SW ? tmp->GetChild(NW) : tmp->GetChild(NE));
+  return (node->GetNodeType() == SW ? tmp->GetChild(NW) : tmp->GetChild(NE));
 }

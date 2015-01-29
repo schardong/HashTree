@@ -27,17 +27,25 @@ void initGL()
   Rhombus* r0 = new Rhombus(v0);
   qt = new QuadTree(r0, RHOMBUS, 2);
 
-  qt->AddPoint(vec2(0.3, 0.3));
-  qt->AddPoint(vec2(0.3, 0.7));
-  qt->AddPoint(vec2(0.4, 0.7));
 
-  qt->AddPoint(vec2(0.5, 0.4));
-  qt->AddPoint(vec2(0.6, 0.4));
-  qt->AddPoint(vec2(0.7, 0.4));
-  qt->AddPoint(vec2(0.8, 0.4));
+  points.push_back(vec2(0.3, 0.3));
+  points.push_back(vec2(0.3, 0.8));
+  points.push_back(vec2(0.4, 0.8));
+  points.push_back(vec2(0.5, 0.4));
+  points.push_back(vec2(0.6, 0.4));
+  points.push_back(vec2(0.7, 0.4));
+  points.push_back(vec2(0.8, 0.4));
 
-  QuadTreeNode* test_node0 = qt->GetRoot()->GetChild(1)->GetChild(0)->FindNeighbor(N);
-  QuadTreeNode* test_node1 = qt->GetRoot()->GetChild(1)->GetChild(1)->FindNeighbor(N);
+  points.push_back(vec2(0.7, 0.6));
+  points.push_back(vec2(0.75, 0.6));
+  points.push_back(vec2(0.8, 0.8));
+  points.push_back(vec2(0.85, 0.8));
+
+  for(size_t i = 0; i < points.size(); ++i)
+    qt->AddPoint(points[i]);
+
+  QuadTreeNode* test_node0 = qt->GetRoot()->GetChild(3)->GetChild(0)->FindNeighbor(S);
+  QuadTreeNode* test_node1 = qt->GetRoot()->GetChild(3)->GetChild(1)->FindNeighbor(S);
   QuadTreeNode* test_node2 = qt->GetRoot()->GetChild(1)->GetChild(2)->FindNeighbor(N);
   QuadTreeNode* test_node3 = qt->GetRoot()->GetChild(1)->GetChild(3)->FindNeighbor(N);
 
@@ -49,14 +57,6 @@ void initGL()
     cout << test_node2->GetId() << endl;
   if(test_node3)
     cout << test_node3->GetId() << endl;
-
-  points.push_back(vec2(0.3, 0.3));
-  points.push_back(vec2(0.3, 0.7));
-  points.push_back(vec2(0.4, 0.7));
-  points.push_back(vec2(0.5, 0.4));
-  points.push_back(vec2(0.6, 0.4));
-  points.push_back(vec2(0.7, 0.4));
-  points.push_back(vec2(0.8, 0.4));
 
   glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
   glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
