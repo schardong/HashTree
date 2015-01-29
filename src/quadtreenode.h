@@ -120,6 +120,8 @@ private:
 
   QuadTreeNode* north_nbr(QuadTreeNode *node);
   QuadTreeNode* south_nbr(QuadTreeNode *node);
+  QuadTreeNode* east_nbr(QuadTreeNode *node);
+  QuadTreeNode* west_nbr(QuadTreeNode *node);
 };
 
 #endif // QUADTREENODE_H

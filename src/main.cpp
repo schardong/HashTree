@@ -44,10 +44,10 @@ void initGL()
   for(size_t i = 0; i < points.size(); ++i)
     qt->AddPoint(points[i]);
 
-  QuadTreeNode* test_node0 = qt->GetRoot()->GetChild(3)->GetChild(0)->FindNeighbor(S);
-  QuadTreeNode* test_node1 = qt->GetRoot()->GetChild(3)->GetChild(1)->FindNeighbor(S);
-  QuadTreeNode* test_node2 = qt->GetRoot()->GetChild(1)->GetChild(2)->FindNeighbor(N);
-  QuadTreeNode* test_node3 = qt->GetRoot()->GetChild(1)->GetChild(3)->FindNeighbor(N);
+  QuadTreeNode* test_node0 = qt->GetRoot()->GetChild(1)->GetChild(0)->FindNeighbor(W);
+  QuadTreeNode* test_node1 = qt->GetRoot()->GetChild(1)->GetChild(2)->FindNeighbor(W);
+  QuadTreeNode* test_node2 = qt->GetRoot()->GetChild(3)->GetChild(0)->FindNeighbor(W);
+  QuadTreeNode* test_node3 = qt->GetRoot()->GetChild(3)->GetChild(2)->FindNeighbor(W);
 
   if(test_node0)
     cout << test_node0->GetId() << endl;

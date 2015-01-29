@@ -257,11 +257,13 @@ QuadTreeNode* QuadTreeNode::FindNeighbor(NBR_DIR dir)
     return south_nbr(this);
     break;
   case E:
+    return east_nbr(this);
     break;
   case N:
     return north_nbr(this);
     break;
   case W:
+    return west_nbr(this);
     break;
   }
 
@@ -285,18 +287,45 @@ QuadTreeNode *QuadTreeNode::north_nbr(QuadTreeNode* node)
 
 QuadTreeNode *QuadTreeNode::south_nbr(QuadTreeNode *node)
 {
-  using namespace std;
-//  cout << node->GetId() << endl;
   if(node->GetParent() == nullptr) //We arrived at the root.
     return nullptr;
 
-  if(node->GetNodeType() >> 1 == 1) {//NORTH-(WEST/EAST) node
+  if(node->GetNodeType() >> 1 == 1) //NORTH-(WEST/EAST) node
     return (node->GetNodeType() == NE ? node->GetParent()->GetChild(SE) : node->GetParent()->GetChild(SW));
-  }
 
   QuadTreeNode* tmp = south_nbr(node->GetParent());
   if(tmp == nullptr || tmp->IsLeaf())
     return tmp;
 
   return (node->GetNodeType() == SW ? tmp->GetChild(NW) : tmp->GetChild(NE));
+}
+
+QuadTreeNode *QuadTreeNode::east_nbr(QuadTreeNode *node)
+{
+  if(node->GetParent() == nullptr) //We arrived at the root.
+    return nullptr;
+
+  if((node->GetNodeType() & 0x1) == 0) //(NORTH/SOUTH)-WEST node
+    return (node->GetNodeType() == NW ? node->GetParent()->GetChild(NE) : node->GetParent()->GetChild(SE));
+
+  QuadTreeNode* tmp = east_nbr(node->GetParent());
+  if(tmp == nullptr || tmp->IsLeaf())
+    return tmp;
+
+  return (node->GetNodeType() == NE ? tmp->GetChild(NW) : tmp->GetChild(SW));
+}
+
+QuadTreeNode *QuadTreeNode::west_nbr(QuadTreeNode *node)
+{
+  if(node->GetParent() == nullptr) //We arrived at the root.
+    return nullptr;
+
+  if((node->GetNodeType() & 0x1) == 1) //(NORTH/SOUTH)-EAST node
+    return (node->GetNodeType() == NE ? node->GetParent()->GetChild(NW) : node->GetParent()->GetChild(SW));
+
+  QuadTreeNode* tmp = west_nbr(node->GetParent());
+  if(tmp == nullptr || tmp->IsLeaf())
+    return tmp;
+
+  return (node->GetNodeType() == NW ? tmp->GetChild(NE) : tmp->GetChild(SE));
 }
