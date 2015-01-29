@@ -1,6 +1,7 @@
 #include <cstring>
 #include <array>
 #include <stack>
+#include <iostream>
 #include <GL/glut.h>
 #include "quadtreenode.h"
 
@@ -206,7 +207,7 @@ void QuadTreeNode::draw_rhombus()
     glVertex2f(corners[1].x, corners[1].y);
     glVertex2f(corners[2].x, corners[2].y);
     glVertex2f(corners[3].x, corners[3].y);
-  glEnd();
+    glEnd();
 }
 
 void QuadTreeNode::draw()
@@ -253,45 +254,46 @@ QuadTreeNode* QuadTreeNode::FindNeighbor(NBR_DIR dir)
 
   switch(dir) {
   case S:
+    return south_nbr(this);
     break;
   case E:
     break;
   case N:
-    if(node_type >> 1 == 1) { //NORTH-SOMETHING
-      stack<NODE_TYPE> sdir;
-      QuadTreeNode* curr_node = this;
-
-      //Find common ancestor.
-      do {
-        sdir.push(curr_node->GetNodeType());
-        curr_node = GetParent();
-        if(curr_node->id == 0)
-          return nullptr;
-      } while(curr_node->GetNodeType() >> 1 != 0);
-
-      //curr_node is the common ancestor.
-      //Must backtrack now.
-      do {
-        int walk_dir = (int)sdir.top();
-        sdir.pop();
-
-        walk_dir ^= 1 << 1;
-        if(curr_node->GetChild(walk_dir) == nullptr)
-          break;
-        curr_node = curr_node->GetChild(walk_dir);
-
-      } while(!sdir.empty());
-
-      //OK, found the node, returning it.
-      return curr_node;
-
-    } else {
-      if(node_type == SE)
-        return parent->GetChild(NE);
-      return parent->GetChild(NW);
-    }
+    return north_nbr(this);
     break;
   case W:
     break;
   }
+
+  return nullptr;
+}
+
+QuadTreeNode *QuadTreeNode::north_nbr(QuadTreeNode* node)
+{
+  if(node->GetParent() == nullptr) //We arrived at the root.
+    return nullptr;
+
+  if(node_type >> 1 == 0) //SOUTH-(WEST/EAST) node
+    return (node_type == SE ? parent->GetChild(NE) : parent->GetChild(NW));
+
+  QuadTreeNode* tmp = north_nbr(node->GetParent());
+  if(tmp == nullptr || tmp->IsLeaf())
+    return tmp;
+
+  return (node_type == NW ? tmp->GetChild(SW) : tmp->GetChild(SE));
+}
+
+QuadTreeNode *QuadTreeNode::south_nbr(QuadTreeNode *node)
+{
+  if(node->GetParent() == nullptr) //We arrived at the root.
+    return nullptr;
+
+  if(node_type >> 1 == 1) //NORTH-(WEST/EAST) node
+    return (node_type == NE ? parent->GetChild(SE) : parent->GetChild(SW));
+
+  QuadTreeNode* tmp = south_nbr(node->GetParent());
+  if(tmp == nullptr || tmp->IsLeaf())
+    return tmp;
+
+  return (node_type == SW ? tmp->GetChild(NW) : tmp->GetChild(NE));
 }

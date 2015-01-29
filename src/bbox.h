@@ -104,7 +104,7 @@ public:
 
   glm::vec2 GetCorner(size_t i)
   {
-    if(i < 0 || i > 3)
+    if(i > 3)
       return m_corners[0];
     return m_corners[i];
   }

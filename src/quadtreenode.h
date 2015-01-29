@@ -55,6 +55,11 @@ public:
     return points.size();
   }
 
+  size_t GetId()
+  {
+    return id;
+  }
+
   BBox* GetBBox()
   {
     return bbox;
@@ -112,6 +117,9 @@ private:
 
   void draw_aabb();
   void draw_rhombus();
+
+  QuadTreeNode* north_nbr(QuadTreeNode *node);
+  QuadTreeNode* south_nbr(QuadTreeNode *node);
 };
 
 #endif // QUADTREENODE_H
