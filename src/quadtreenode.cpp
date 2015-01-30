@@ -33,9 +33,9 @@ QuadTreeNode::~QuadTreeNode()
       delete children[i];
       children[i] = nullptr;
     }
-  } else {
-    points.clear();
   }
+  else
+    points.clear();
 
   delete bbox;
   bbox = nullptr;

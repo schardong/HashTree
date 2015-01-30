@@ -31,6 +31,11 @@ std::vector<glm::vec2> QuadTree::GetPointsInRange(BBox *range)
   return root_node->GetPointsInRange(range);
 }
 
+void QuadTree::BalanceTree()
+{
+
+}
+
 void QuadTree::draw()  
 {
   root_node->draw();

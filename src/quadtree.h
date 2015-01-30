@@ -34,9 +34,10 @@ public:
   {
     return root_node;
   }
-  
+
+  void BalanceTree();
   void draw();
-  void delEmptyLeaves();
+  void delEmptyLeaves(); //tmp method
 
 private:
   size_t max_points_node;

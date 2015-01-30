@@ -16,6 +16,7 @@ using glm::vec3;
 
 static int WIN_WIDTH = 800;
 static int WIN_HEIGHT = 800;
+static int win_id = -1;
 
 QuadTree* qt;
 
@@ -26,7 +27,6 @@ void initGL()
   array<vec2, 4> v0 = {vec2(0, 0.1), vec2(0.8, 0.1), vec2(1, 0.9), vec2(0.2, 0.9)};
   Rhombus* r0 = new Rhombus(v0);
   qt = new QuadTree(r0, RHOMBUS, 2);
-
 
   points.push_back(vec2(0.3, 0.3));
   points.push_back(vec2(0.3, 0.8));
@@ -43,20 +43,6 @@ void initGL()
 
   for(size_t i = 0; i < points.size(); ++i)
     qt->AddPoint(points[i]);
-
-  QuadTreeNode* test_node0 = qt->GetRoot()->GetChild(1)->GetChild(0)->FindNeighbor(W);
-  QuadTreeNode* test_node1 = qt->GetRoot()->GetChild(1)->GetChild(2)->FindNeighbor(W);
-  QuadTreeNode* test_node2 = qt->GetRoot()->GetChild(3)->GetChild(0)->FindNeighbor(W);
-  QuadTreeNode* test_node3 = qt->GetRoot()->GetChild(3)->GetChild(2)->FindNeighbor(W);
-
-  if(test_node0)
-    cout << test_node0->GetId() << endl;
-  if(test_node1)
-    cout << test_node1->GetId() << endl;
-  if(test_node2)
-    cout << test_node2->GetId() << endl;
-  if(test_node3)
-    cout << test_node3->GetId() << endl;
 
   glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
   glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -79,7 +65,7 @@ void display()
 
   qt->draw();
 
-  glFlush();
+  glutSwapBuffers();
 }
 
 void reshape(GLsizei width, GLsizei height)
@@ -98,7 +84,7 @@ void reshape(GLsizei width, GLsizei height)
   gluOrtho2D(0, 1, 0, 1);
 }
 
-void mouseClick(int button, int state, int x, int y)
+void mouse_click(int button, int state, int x, int y)
 {
   if(state == GLUT_UP) {
     switch(button)
@@ -114,15 +100,35 @@ void mouseClick(int button, int state, int x, int y)
   }
 }
 
+void keyboard_down(unsigned char c, int, int)
+{
+  switch(c) {
+  case 27: //ESC
+    glutDestroyWindow(win_id);
+    delete qt;
+    qt = nullptr;
+    exit(0);
+    break;
+  case 32: //ENTER
+    qt->BalanceTree();
+    break;
+  }
+
+  glutPostRedisplay();
+}
+
 int main(int argc, char** argv)
 {
   glutInit(&argc, argv);
   glutInitWindowSize(WIN_WIDTH, WIN_HEIGHT);
   glutInitWindowPosition(50, 50);
-  glutCreateWindow("Viewport Transform");
+  win_id = glutCreateWindow("Viewport Transform");
   glutDisplayFunc(display);
+  glutIdleFunc(display);
   glutReshapeFunc(reshape);
-  glutMouseFunc(mouseClick);
+  glutMouseFunc(mouse_click);
+  glutKeyboardFunc(keyboard_down);
+
   initGL();
   glutMainLoop();
   return 0;
