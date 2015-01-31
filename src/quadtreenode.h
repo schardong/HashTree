@@ -3,6 +3,7 @@
 
 #include "bbox.h"
 #include <vector>
+#include <queue>
 #include <glm/glm.hpp>
 
 enum BBOX_TYPE
@@ -65,12 +66,18 @@ public:
     return bbox;
   }
 
-  size_t GetDepth()
+  QuadTreeNode* GetChild(int idx)
+  {
+    assert(idx >= 0 && idx <= 3);
+    return children[idx];
+  }
+
+  int GetDepth()
   {
     return depth;
   }
 
-  void SetDepth(size_t d)
+  void SetDepth(int d)
   {
     depth = d;
   }
@@ -85,26 +92,20 @@ public:
     parent = p;
   }
 
-  QuadTreeNode* GetChild(int idx)
-  {
-    assert(idx >= 0 && idx <= 3);
-    return children[idx];
-  }
-
   NODE_TYPE GetNodeType()
   {
     return node_type;
   }
 
   QuadTreeNode* FindNeighbor(NBR_DIR dir);
-
+  void BalanceTree();
   void draw();
   void delEmptyLeaves();
 
 private:
   size_t id;
-  size_t depth;
   size_t max_points;
+  int depth;
   BBox* bbox;
   BBOX_TYPE box_type;
   NODE_TYPE node_type;
@@ -122,6 +123,8 @@ private:
   QuadTreeNode* south_nbr(QuadTreeNode *node);
   QuadTreeNode* east_nbr(QuadTreeNode *node);
   QuadTreeNode* west_nbr(QuadTreeNode *node);
+
+  std::queue<QuadTreeNode*> queue_leaves();
 };
 
 #endif // QUADTREENODE_H

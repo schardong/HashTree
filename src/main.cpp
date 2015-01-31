@@ -109,7 +109,8 @@ void keyboard_down(unsigned char c, int, int)
     qt = nullptr;
     exit(0);
     break;
-  case 32: //ENTER
+  case 32: //SPACEBAR
+    cout << "balancing!\n";
     qt->BalanceTree();
     break;
   }

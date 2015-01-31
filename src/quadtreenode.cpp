@@ -18,7 +18,7 @@ QuadTreeNode::QuadTreeNode(BBox* box,
                            size_t max_npoints,
                            NODE_TYPE nt,
                            std::vector<glm::vec2> p) :
-bbox(box), box_type(t), node_type(nt), points(p), max_points(max_npoints)
+  bbox(box), box_type(t), node_type(nt), points(p), max_points(max_npoints)
 {
   id = g_quad_node_id++;
   depth = 0;
@@ -44,7 +44,7 @@ QuadTreeNode::~QuadTreeNode()
 
 void QuadTreeNode::Split()
 {
-  if(!IsLeaf() || points.size() < max_points)
+  if(!IsLeaf())
     return;
 
   switch(box_type) {
@@ -203,11 +203,11 @@ void QuadTreeNode::draw_rhombus()
     corners[i] = box->GetCorner(i);
 
   glBegin(GL_QUADS);
-    glVertex2f(corners[0].x, corners[0].y);
-    glVertex2f(corners[1].x, corners[1].y);
-    glVertex2f(corners[2].x, corners[2].y);
-    glVertex2f(corners[3].x, corners[3].y);
-    glEnd();
+  glVertex2f(corners[0].x, corners[0].y);
+  glVertex2f(corners[1].x, corners[1].y);
+  glVertex2f(corners[2].x, corners[2].y);
+  glVertex2f(corners[3].x, corners[3].y);
+  glEnd();
 }
 
 void QuadTreeNode::draw()
@@ -270,6 +270,42 @@ QuadTreeNode* QuadTreeNode::FindNeighbor(NBR_DIR dir)
   return nullptr;
 }
 
+void QuadTreeNode::BalanceTree()
+{
+  using namespace std;
+  queue<QuadTreeNode*> leaves = queue_leaves();
+
+  int num_it = 0;
+
+  do {
+    QuadTreeNode* curr_node = leaves.front();
+    leaves.pop();
+
+    for(int i = 0; i < 4; ++i) {
+      QuadTreeNode* nbr = curr_node->FindNeighbor((NBR_DIR)i);
+      if(nbr == nullptr)
+        continue;
+
+      int diff = curr_node->GetDepth() - nbr->GetDepth();
+      if(abs(diff) > 1) {
+        cout << abs(diff) << endl;
+        QuadTreeNode* tmp;
+        if(diff > 0)
+          tmp = nbr;
+        else
+          tmp = curr_node;
+
+        tmp->Split();
+        for(int j = 0; j < 4; ++j)
+          leaves.push(tmp->GetChild(i));
+      }
+    }
+
+    ++num_it;
+
+  } while(!leaves.empty());
+}
+
 QuadTreeNode *QuadTreeNode::north_nbr(QuadTreeNode* node)
 {
   if(node->GetParent() == nullptr) //We arrived at the root.
@@ -328,4 +364,29 @@ QuadTreeNode *QuadTreeNode::west_nbr(QuadTreeNode *node)
     return tmp;
 
   return (node->GetNodeType() == NW ? tmp->GetChild(NE) : tmp->GetChild(SE));
+}
+
+std::queue<QuadTreeNode *> QuadTreeNode::queue_leaves()
+{
+  using namespace std;
+  queue<QuadTreeNode*> leaves;
+
+  queue<QuadTreeNode*> bfs;
+  bfs.push(this);
+
+  do {
+    QuadTreeNode* curr_node = bfs.front();
+    bfs.pop();
+
+    if(curr_node->IsLeaf()) {
+      leaves.push(curr_node);
+      continue;
+    }
+
+    for(size_t i = 0; i < 4; ++i)
+      bfs.push(curr_node->GetChild(i));
+
+  } while(!bfs.empty());
+
+  return leaves;
 }
