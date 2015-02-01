@@ -26,29 +26,29 @@ void initGL()
 {
   array<vec2, 4> v0 = {vec2(0, 0.1), vec2(0.8, 0.1), vec2(1, 0.9), vec2(0.2, 0.9)};
   Rhombus* r0 = new Rhombus(v0);
-  qt = new QuadTree(r0, RHOMBUS, 2);
+  qt = new QuadTree(r0, RHOMBUS, 1);
 
-  points.push_back(vec2(0.3, 0.3));
-  points.push_back(vec2(0.3, 0.8));
-  points.push_back(vec2(0.4, 0.8));
-  points.push_back(vec2(0.5, 0.4));
-  points.push_back(vec2(0.6, 0.4));
-  points.push_back(vec2(0.7, 0.4));
-  points.push_back(vec2(0.8, 0.4));
+//  points.push_back(vec2(0.3, 0.3));
+//  points.push_back(vec2(0.3, 0.8));
+//  points.push_back(vec2(0.4, 0.8));
+//  points.push_back(vec2(0.5, 0.4));
+//  points.push_back(vec2(0.6, 0.4));
+//  points.push_back(vec2(0.7, 0.4));
+//  points.push_back(vec2(0.8, 0.4));
 
-  points.push_back(vec2(0.7, 0.6));
-  points.push_back(vec2(0.75, 0.6));
-  points.push_back(vec2(0.8, 0.8));
-  points.push_back(vec2(0.85, 0.8));
+//  points.push_back(vec2(0.7, 0.6));
+//  points.push_back(vec2(0.75, 0.6));
+//  points.push_back(vec2(0.8, 0.8));
+//  points.push_back(vec2(0.85, 0.8));
 
-  for(size_t i = 0; i < points.size(); ++i)
-    qt->AddPoint(points[i]);
+//  for(size_t i = 0; i < points.size(); ++i)
+//    qt->AddPoint(points[i]);
 
   glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
   glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();
-  glPointSize(2);
+  glPointSize(3);
 }
 
 void display()
@@ -61,8 +61,14 @@ void display()
     glVertex2f(points[i].x, points[i].y);
   glEnd();
 
-  glColor3f(1, 0, 0);
+  glColor3f(0, 1, 1);
+  glBegin(GL_LINE_LOOP);
+  for(size_t i = 0; i < points.size(); ++i) {
+    glVertex2f(points[i].x, points[i].y);
+  }
+  glEnd();
 
+  glColor3f(1, 0, 0);
   qt->draw();
 
   glutSwapBuffers();
@@ -112,6 +118,9 @@ void keyboard_down(unsigned char c, int, int)
   case 32: //SPACEBAR
     cout << "balancing!\n";
     qt->BalanceTree();
+    break;
+  case GLUT_KEY_F1:
+    qt->EnforceCornerCond();
     break;
   }
 

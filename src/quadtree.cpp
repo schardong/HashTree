@@ -36,6 +36,11 @@ void QuadTree::BalanceTree()
   root_node->BalanceTree();
 }
 
+void QuadTree::EnforceCornerCond()
+{
+  root_node->EnforceCornerCond();
+}
+
 void QuadTree::draw()  
 {
   root_node->draw();

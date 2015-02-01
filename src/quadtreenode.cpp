@@ -273,22 +273,18 @@ QuadTreeNode* QuadTreeNode::FindNeighbor(NBR_DIR dir)
 void QuadTreeNode::BalanceTree()
 {
   using namespace std;
-  queue<QuadTreeNode*> leaves = queue_leaves();
+  vector<QuadTreeNode*> leaves = queue_leaves();
 
-  int num_it = 0;
+  for(size_t i = 0; i < leaves.size(); ++i) {
+    QuadTreeNode* curr_node = leaves[i];
 
-  do {
-    QuadTreeNode* curr_node = leaves.front();
-    leaves.pop();
-
-    for(int i = 0; i < 4; ++i) {
-      QuadTreeNode* nbr = curr_node->FindNeighbor((NBR_DIR)i);
+    for(int j = 0; j < 4; ++j) {
+      QuadTreeNode* nbr = curr_node->FindNeighbor((NBR_DIR)j);
       if(nbr == nullptr)
         continue;
 
       int diff = curr_node->GetDepth() - nbr->GetDepth();
       if(abs(diff) > 1) {
-        cout << abs(diff) << endl;
         QuadTreeNode* tmp;
         if(diff > 0)
           tmp = nbr;
@@ -296,14 +292,22 @@ void QuadTreeNode::BalanceTree()
           tmp = curr_node;
 
         tmp->Split();
-        for(int j = 0; j < 4; ++j)
-          leaves.push(tmp->GetChild(i));
+        for(int k = 0; k < 4; ++k)
+          leaves.push_back(tmp->GetChild(k));
       }
     }
 
-    ++num_it;
+  }
+}
 
-  } while(!leaves.empty());
+void QuadTreeNode::EnforceCornerCond()
+{
+  /*If p is a single point and the angle \alpha of the edges that meet at p is < 60º:
+      Then the bounding box B containing p and its first neighbors must have the same size.
+    Else if \alpha is > 60º then:
+      Then B and its first, second an third neighbors must be of the same size.*/
+
+  if(1 == 1);
 }
 
 QuadTreeNode *QuadTreeNode::north_nbr(QuadTreeNode* node)
@@ -366,10 +370,10 @@ QuadTreeNode *QuadTreeNode::west_nbr(QuadTreeNode *node)
   return (node->GetNodeType() == NW ? tmp->GetChild(NE) : tmp->GetChild(SE));
 }
 
-std::queue<QuadTreeNode *> QuadTreeNode::queue_leaves()
+std::vector<QuadTreeNode *> QuadTreeNode::queue_leaves()
 {
   using namespace std;
-  queue<QuadTreeNode*> leaves;
+  vector<QuadTreeNode*> leaves;
 
   queue<QuadTreeNode*> bfs;
   bfs.push(this);
@@ -379,7 +383,7 @@ std::queue<QuadTreeNode *> QuadTreeNode::queue_leaves()
     bfs.pop();
 
     if(curr_node->IsLeaf()) {
-      leaves.push(curr_node);
+      leaves.push_back(curr_node);
       continue;
     }
 
@@ -389,4 +393,19 @@ std::queue<QuadTreeNode *> QuadTreeNode::queue_leaves()
   } while(!bfs.empty());
 
   return leaves;
+}
+
+std::vector<QuadTreeNode *> QuadTreeNode::get_first_nbrs(QuadTreeNode *node)
+{
+
+}
+
+std::vector<QuadTreeNode *> QuadTreeNode::get_second_nbrs(QuadTreeNode *node)
+{
+
+}
+
+std::vector<QuadTreeNode *> QuadTreeNode::get_third_nbrs(QuadTreeNode *node)
+{
+
 }

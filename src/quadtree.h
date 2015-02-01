@@ -36,6 +36,7 @@ public:
   }
 
   void BalanceTree();
+  void EnforceCornerCond();
   void draw();
   void delEmptyLeaves(); //tmp method
 
