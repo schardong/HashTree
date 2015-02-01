@@ -9,7 +9,7 @@
 class QuadTree
 {
 public:
-  QuadTree(BBox *bbox, BBOX_TYPE t = AXIS_ALIGNED, size_t num_points_node = 64);
+  QuadTree(BBox *bbox, size_t num_points_node = 64);
   virtual ~QuadTree();
 
   virtual bool AddPoint(glm::vec2 p);

@@ -10,15 +10,13 @@ static size_t g_quad_node_id = 0;
 QuadTreeNode::QuadTreeNode()
 {
   max_points = 64;
-  box_type = AXIS_ALIGNED;
 }
 
 QuadTreeNode::QuadTreeNode(BBox* box,
-                           BBOX_TYPE t,
                            size_t max_npoints,
                            NODE_TYPE nt,
                            std::vector<glm::vec2> p) :
-  bbox(box), box_type(t), node_type(nt), points(p), max_points(max_npoints)
+  bbox(box), node_type(nt), points(p), max_points(max_npoints)
 {
   id = g_quad_node_id++;
   depth = 0;
@@ -44,19 +42,46 @@ QuadTreeNode::~QuadTreeNode()
 
 void QuadTreeNode::Split()
 {
+  using namespace std;
+  using namespace glm;
+
   if(!IsLeaf())
     return;
 
-  switch(box_type) {
-  case AXIS_ALIGNED:
-  default:
-    split_aabb();
-    break;
-  case RHOMBUS:
-    split_rhombus();
-    break;
+  vector<vec2> p_quads[4];
+  array<BBox*, 4> bbox_quads;
+  BBox* box = (BBox*) bbox;
+
+  vec2 e0_midp = 0.5f * (box->GetCorner(1) - box->GetCorner(0)) + box->GetCorner(0);
+  vec2 e1_midp = 0.5f * (box->GetCorner(2) - box->GetCorner(1)) + box->GetCorner(1);
+  vec2 e2_midp = 0.5f * (box->GetCorner(3) - box->GetCorner(2)) + box->GetCorner(2);
+  vec2 e3_midp = 0.5f * (box->GetCorner(0) - box->GetCorner(3)) + box->GetCorner(3);
+  vec2 midd = 0.5f * (box->GetCorner(2) - box->GetCorner(0)) + box->GetCorner(0);
+
+  array<vec2, 4> v0 = {box->GetCorner(0), e0_midp, midd, e3_midp};
+  array<vec2, 4> v1 = {e0_midp, box->GetCorner(1), e1_midp, midd};
+  array<vec2, 4> v2 = {e3_midp, midd, e2_midp, box->GetCorner(3)};
+  array<vec2, 4> v3 = {midd, e1_midp, box->GetCorner(2), e2_midp};
+
+  bbox_quads[SW] = new BBox(v0);
+  bbox_quads[SE] = new BBox(v1);
+  bbox_quads[NW] = new BBox(v2);
+  bbox_quads[NE] = new BBox(v3);
+
+  for(auto it = points.begin(); it != points.end(); ++it) {
+    for(size_t i = 0; i < 4; ++i) {
+      if(bbox_quads[i]->PointInBox(*it)) {
+        p_quads[i].push_back(*it);
+        break;
+      }
+    }
   }
 
+  for(int i = 0; i < 4; ++i) {
+    children[i] = new QuadTreeNode(bbox_quads[i], max_points, (NODE_TYPE)i, p_quads[i]);
+    children[i]->SetDepth(GetDepth() + 1);
+    children[i]->SetParent(this);
+  }
   points.clear();
 }
 
@@ -111,116 +136,19 @@ std::vector<glm::vec2> QuadTreeNode::GetPointsInRange(BBox* range)
   return p_range;
 }
 
-void QuadTreeNode::split_aabb()
+void QuadTreeNode::draw()
 {
-  using std::vector;
-  using std::array;
-  using glm::vec2;
-
-  vector<vec2> p_quads[4];
-  array<AABB*, 4> bbox_quads;
-  AABB* box = (AABB*) bbox;
-
-  double e = box->GetEdgeSz() / 2;
-  double cx = box->GetCorner().x;
-  double cy = box->GetCorner().y;
-
-  bbox_quads[0] = new AABB(box->GetCorner(), e);
-  bbox_quads[1] = new AABB(vec2(cx + e, cy), e);
-  bbox_quads[2] = new AABB(vec2(cx  + e, cy + e), e);
-  bbox_quads[3] = new AABB(vec2(cx, cy + e), e);
-
-  for(auto it = points.begin(); it != points.end(); ++it) {
-    for(size_t i = 0; i < 4; ++i) {
-      if(bbox_quads[i]->PointInBox(*it)) {
-        p_quads[i].push_back(*it);
-        break;
-      }
-    }
-  }
-
-  for(size_t i = 0; i < 4; ++i) {
-    children[i] = new QuadTreeNode(bbox_quads[i], box_type, max_points, (NODE_TYPE)i, p_quads[i]);
-    children[i]->SetDepth(GetDepth() + 1);
-    children[i]->SetParent(this);
-  }
-}
-
-void QuadTreeNode::split_rhombus()
-{
-  using std::vector;
-  using std::array;
-  using glm::vec2;
-
-  vector<vec2> p_quads[4];
-  array<Rhombus*, 4> bbox_quads;
-  Rhombus* box = (Rhombus*) bbox;
-
-  vec2 e0_midp = 0.5f * (box->GetCorner(1) - box->GetCorner(0)) + box->GetCorner(0);
-  vec2 e1_midp = 0.5f * (box->GetCorner(2) - box->GetCorner(1)) + box->GetCorner(1);
-  vec2 e2_midp = 0.5f * (box->GetCorner(3) - box->GetCorner(2)) + box->GetCorner(2);
-  vec2 e3_midp = 0.5f * (box->GetCorner(0) - box->GetCorner(3)) + box->GetCorner(3);
-  vec2 midd = 0.5f * (box->GetCorner(2) - box->GetCorner(0)) + box->GetCorner(0);
-
-  array<vec2, 4> v0 = {box->GetCorner(0), e0_midp, midd, e3_midp};
-  array<vec2, 4> v1 = {e0_midp, box->GetCorner(1), e1_midp, midd};
-  array<vec2, 4> v2 = {e3_midp, midd, e2_midp, box->GetCorner(3)};
-  array<vec2, 4> v3 = {midd, e1_midp, box->GetCorner(2), e2_midp};
-
-  bbox_quads[SW] = new Rhombus(v0);
-  bbox_quads[SE] = new Rhombus(v1);
-  bbox_quads[NW] = new Rhombus(v2);
-  bbox_quads[NE] = new Rhombus(v3);
-
-  for(auto it = points.begin(); it != points.end(); ++it) {
-    for(size_t i = 0; i < 4; ++i) {
-      if(bbox_quads[i]->PointInBox(*it)) {
-        p_quads[i].push_back(*it);
-        break;
-      }
-    }
-  }
-
-  for(int i = 0; i < 4; ++i) {
-    children[i] = new QuadTreeNode(bbox_quads[i], box_type, max_points, (NODE_TYPE)i, p_quads[i]);
-    children[i]->SetDepth(GetDepth() + 1);
-    children[i]->SetParent(this);
-  }
-}
-
-void QuadTreeNode::draw_aabb()
-{
-  //TODO: Something
-}
-
-void QuadTreeNode::draw_rhombus()
-{
-  Rhombus* box = (Rhombus*)bbox;
-
   std::array<glm::vec2, 4> corners;
 
   for(int i = 0; i < 4; ++i)
-    corners[i] = box->GetCorner(i);
+    corners[i] = bbox->GetCorner(i);
 
   glBegin(GL_QUADS);
-  glVertex2f(corners[0].x, corners[0].y);
-  glVertex2f(corners[1].x, corners[1].y);
-  glVertex2f(corners[2].x, corners[2].y);
-  glVertex2f(corners[3].x, corners[3].y);
+    glVertex2f(corners[0].x, corners[0].y);
+    glVertex2f(corners[1].x, corners[1].y);
+    glVertex2f(corners[2].x, corners[2].y);
+    glVertex2f(corners[3].x, corners[3].y);
   glEnd();
-}
-
-void QuadTreeNode::draw()
-{
-  switch(box_type) {
-  case AXIS_ALIGNED:
-  default:
-    draw_aabb();
-    break;
-  case RHOMBUS:
-    draw_rhombus();
-    break;
-  }
 
   if(!IsLeaf())
     for(int i = 0; i < 4; ++i)

@@ -1,12 +1,12 @@
 #include "quadtree.h"
 #include "quadtreenode.h"
 
-QuadTree::QuadTree(BBox* bbox, BBOX_TYPE t, size_t num_points_node) :
+QuadTree::QuadTree(BBox* bbox, size_t num_points_node) :
   m_num_points(0),
   depth(0),
   max_points_node(num_points_node)
 {
-  root_node = new QuadTreeNode(bbox, t, num_points_node);
+  root_node = new QuadTreeNode(bbox, num_points_node);
 }
 
 QuadTree::~QuadTree()

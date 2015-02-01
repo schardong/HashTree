@@ -25,8 +25,8 @@ vector<vec2> points;
 void initGL()
 {
   array<vec2, 4> v0 = {vec2(0, 0.1), vec2(0.8, 0.1), vec2(1, 0.9), vec2(0.2, 0.9)};
-  Rhombus* r0 = new Rhombus(v0);
-  qt = new QuadTree(r0, RHOMBUS, 1);
+  BBox* r0 = new BBox(v0);
+  qt = new QuadTree(r0, 1);
 
 //  points.push_back(vec2(0.3, 0.3));
 //  points.push_back(vec2(0.3, 0.8));

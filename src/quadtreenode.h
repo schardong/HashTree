@@ -6,12 +6,6 @@
 #include <queue>
 #include <glm/glm.hpp>
 
-enum BBOX_TYPE
-{
-  AXIS_ALIGNED,
-  RHOMBUS
-};
-
 enum NODE_TYPE
 {
   SW,
@@ -35,7 +29,6 @@ public:
   QuadTreeNode();
 
   QuadTreeNode(BBox* box,
-               BBOX_TYPE t = AXIS_ALIGNED,
                size_t max_npoints = 64,
                NODE_TYPE nt = ROOT,
                std::vector<glm::vec2> p = std::vector<glm::vec2>());
@@ -108,17 +101,10 @@ private:
   size_t max_points;
   int depth;
   BBox* bbox;
-  BBOX_TYPE box_type;
   NODE_TYPE node_type;
   QuadTreeNode* children[4];
   QuadTreeNode* parent;
   std::vector<glm::vec2> points;
-
-  void split_aabb();
-  void split_rhombus();
-
-  void draw_aabb();
-  void draw_rhombus();
 
   QuadTreeNode* north_nbr(QuadTreeNode *node);
   QuadTreeNode* south_nbr(QuadTreeNode *node);
