@@ -397,7 +397,13 @@ std::vector<QuadTreeNode *> QuadTreeNode::queue_leaves()
 
 std::vector<QuadTreeNode *> QuadTreeNode::get_first_nbrs(QuadTreeNode *node)
 {
+  using namespace std;
+  vector<QuadTreeNode*> leaves = queue_leaves();
+  vector<QuadTreeNode*> nbrs;
 
+  for(size_t i = 0; i < leaves.size(); ++i) {
+
+  }
 }
 
 std::vector<QuadTreeNode *> QuadTreeNode::get_second_nbrs(QuadTreeNode *node)
