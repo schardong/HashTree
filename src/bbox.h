@@ -4,7 +4,6 @@
 #include <glm/glm.hpp>
 #include <array>
 
-
 class BBox
 {
 public:

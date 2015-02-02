@@ -235,7 +235,9 @@ void QuadTreeNode::EnforceCornerCond()
     Else if \alpha is > 60º then:
       Then B and its first, second an third neighbors must be of the same size.*/
 
-  if(1 == 1);
+  using namespace std;
+
+  vector<QuadTreeNode*> leaves = queue_leaves();
 }
 
 QuadTreeNode *QuadTreeNode::north_nbr(QuadTreeNode* node)
@@ -323,23 +325,37 @@ std::vector<QuadTreeNode *> QuadTreeNode::queue_leaves()
   return leaves;
 }
 
-std::vector<QuadTreeNode *> QuadTreeNode::get_first_nbrs(QuadTreeNode *node)
+std::vector<QuadTreeNode *> QuadTreeNode::get_first_nbrs(QuadTreeNode *node, std::vector<QuadTreeNode*> leaves)
 {
   using namespace std;
-  vector<QuadTreeNode*> leaves = queue_leaves();
+  using namespace glm;
   vector<QuadTreeNode*> nbrs;
 
-  for(size_t i = 0; i < leaves.size(); ++i) {
+  BBox* node_box = node->GetBBox();
 
+  for(size_t i = 0; i < leaves.size(); ++i) {
+    BBox* leaf_box = leaves[i]->GetBBox();
+
+    for(size_t j = 0; j < 4; ++j) {
+      vec2 leaf_corner = leaf_box->GetCorner(i);
+      if(node_box->GetCorner(0) == leaf_corner ||
+         node_box->GetCorner(1) == leaf_corner ||
+         node_box->GetCorner(2) == leaf_corner ||
+         node_box->GetCorner(3) == leaf_corner)
+      {
+        nbrs.push_back(leaves[i]);
+        break;
+      }
+    }
   }
 }
 
-std::vector<QuadTreeNode *> QuadTreeNode::get_second_nbrs(QuadTreeNode *node)
+std::vector<QuadTreeNode *> QuadTreeNode::get_second_nbrs(QuadTreeNode *node, std::vector<QuadTreeNode*> leaves)
 {
 
 }
 
-std::vector<QuadTreeNode *> QuadTreeNode::get_third_nbrs(QuadTreeNode *node)
+std::vector<QuadTreeNode *> QuadTreeNode::get_third_nbrs(QuadTreeNode *node, std::vector<QuadTreeNode*> leaves)
 {
 
 }

@@ -113,9 +113,9 @@ private:
 
   std::vector<QuadTreeNode *> queue_leaves();
 
-  std::vector<QuadTreeNode*> get_first_nbrs(QuadTreeNode* node);
-  std::vector<QuadTreeNode*> get_second_nbrs(QuadTreeNode* node);
-  std::vector<QuadTreeNode*> get_third_nbrs(QuadTreeNode* node);
+  std::vector<QuadTreeNode*> get_first_nbrs(QuadTreeNode* node, std::vector<QuadTreeNode *> leaves);
+  std::vector<QuadTreeNode*> get_second_nbrs(QuadTreeNode* node, std::vector<QuadTreeNode *> leaves);
+  std::vector<QuadTreeNode*> get_third_nbrs(QuadTreeNode* node, std::vector<QuadTreeNode *> leaves);
 
 };
 
