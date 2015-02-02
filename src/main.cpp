@@ -2,6 +2,7 @@
 #include <glm/glm.hpp>
 #include <array>
 #include <vector>
+#include <map>
 
 #include "quadtree.h"
 
@@ -11,6 +12,7 @@ using std::cout;
 using std::endl;
 using std::array;
 using std::vector;
+using std::pair;
 using glm::vec2;
 using glm::vec3;
 
@@ -21,6 +23,7 @@ static int win_id = -1;
 QuadTree* qt;
 
 vector<vec2> points;
+vector<pair<int, int> > edges;
 
 void initGL()
 {
@@ -99,8 +102,11 @@ void mouse_click(int button, int state, int x, int y)
     default:
       vec2 p;
       p = vec2(x / (float)WIN_WIDTH, (WIN_HEIGHT - y) / (float)WIN_HEIGHT);
-      if(qt->AddPoint(p))
+      if(qt->AddPoint(p)) {
         points.push_back(p);
+        edges.push_back(pair<int, int>(points.size() - 2, points.size() - 1));
+        edges.push_back(pair<int, int>(points.size() - 1, points.size() - 2));
+      }
       break;
     }
   }
