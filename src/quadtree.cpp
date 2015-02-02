@@ -197,6 +197,31 @@ std::vector<QuadTreeNode*> get_third_neighbors(QuadTreeNode* node,
   if(node == nullptr || leaves.empty())
     return nbrs;
 
+  vector<QuadTreeNode*> fst_nbrs = get_first_nbrs(node, leaves);
+  vector<QuadTreeNode*> scnd_nbrs = get_second_neighbors(node, leaves);
+  if(fst_nbrs.empty() || scnd_nbrs.empty())
+    return nbrs;
+
+  set<QuadTreeNode*> tmp_nbrs;
+  for(size_t i = 0; i < scnd_nbrs.size(); ++i) {
+    vector<QuadTreeNode*> tmp_scnd_nbrs = get_first_nbrs(scnd_nbrs[i], leaves);
+    tmp_nbrs.insert(tmp_scnd_nbrs.begin(), tmp_scnd_nbrs.end());
+  }
+
+  //Erasing the node and its first neighbors.
+  //All the nodes left in the set are the second and third neighbors.
+  tmp_nbrs.erase(node);
+  for(size_t i = 0; i < fst_nbrs.size(); ++i) 
+    tmp_nbrs.erase(fst_nbrs[i]);
+
+  //Erasing the node's second neighbors.
+  //All the nodes left in the set are the third neighbors.
+  for(size_t i = 0; i < scnd_nbrs.size(); ++i) 
+    tmp_nbrs.erase(scnd_nbrs[i]);
+
+  for(auto it = tmp_nbrs.begin(); it != tmp_nbrs.end(); ++it)
+    nbrs.push_back(*it);
+
   return nbrs;
 }
 
@@ -209,8 +234,9 @@ void enforce_corners(QuadTree* qt)
   vector<QuadTreeNode*> leaves = qt->GetLeaves();
   vector<QuadTreeNode*> pop_leaves = get_populated_leaves(qt);
 
-  vector<QuadTreeNode*> test_nbrs = get_first_nbrs(pop_leaves[0], leaves);
+  pop_leaves[0]->SetColor(glm::vec3(0, 0, 1));
 
+  vector<QuadTreeNode*> test_nbrs = get_first_nbrs(pop_leaves[0], leaves);
   cout << test_nbrs.size() << " first neighbors" << endl;
   for(size_t i = 0; i < test_nbrs.size(); ++i) {
     cout << test_nbrs[i]->GetId() << " ";
@@ -219,13 +245,18 @@ void enforce_corners(QuadTree* qt)
   cout << endl;
 
   test_nbrs = get_second_neighbors(pop_leaves[0], leaves);
-
-  pop_leaves[0]->SetColor(glm::vec3(0, 0, 1));
-
   cout << test_nbrs.size() << " second neighbors" << endl;
   for(size_t i = 0; i < test_nbrs.size(); ++i) {
     cout << test_nbrs[i]->GetId() << " ";
     test_nbrs[i]->SetColor(glm::vec3(1, 1, 0));
+  }
+  cout << endl;
+
+  test_nbrs = get_third_neighbors(pop_leaves[0], leaves);
+  cout << test_nbrs.size() << " third neighbors" << endl;
+  for(size_t i = 0; i < test_nbrs.size(); ++i) {
+    cout << test_nbrs[i]->GetId() << " ";
+    test_nbrs[i]->SetColor(glm::vec3(0, 1, 1));
   }
   cout << endl;
 }
