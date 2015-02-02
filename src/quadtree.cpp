@@ -1,6 +1,7 @@
 #include "quadtree.h"
 #include "quadtreenode.h"
 #include <iostream>
+#include <set>
 
 QuadTree::QuadTree(BBox* bbox, size_t num_points_node) :
   m_num_points(0),
@@ -153,6 +154,52 @@ std::vector<QuadTreeNode*> get_first_nbrs(QuadTreeNode* node,
   return nbrs;
 }
 
+std::vector<QuadTreeNode*> get_second_neighbors(QuadTreeNode* node,
+                                                std::vector<QuadTreeNode*> leaves)
+{
+  using namespace std;
+  vector<QuadTreeNode*> nbrs;
+
+  if(node == nullptr || leaves.empty())
+    return nbrs;
+
+  //Getting the node's first neighbors.
+  vector<QuadTreeNode*> fst_nbrs = get_first_nbrs(node, leaves);
+  if(fst_nbrs.empty())
+    return nbrs;
+
+  //For each first neighbor, we get it's first neighbors. The second neighbors
+  //should be in this set as well as the other first neighbors and the node.
+  set<QuadTreeNode*> tmp_nbrs;
+  for(size_t i = 0; i < fst_nbrs.size(); ++i) {
+    vector<QuadTreeNode*> tmp_fst_nbrs = get_first_nbrs(fst_nbrs[i], leaves);
+    tmp_nbrs.insert(tmp_fst_nbrs.begin(), tmp_fst_nbrs.end());
+  }
+
+  //Erasing the node and its first neighbors.
+  //All the nodes left in the set are the second neighbors.
+  tmp_nbrs.erase(node);
+  for(size_t i = 0; i < fst_nbrs.size(); ++i) 
+    tmp_nbrs.erase(fst_nbrs[i]);
+
+  for(auto it = tmp_nbrs.begin(); it != tmp_nbrs.end(); ++it)
+    nbrs.push_back(*it);
+
+  return nbrs;
+}
+
+std::vector<QuadTreeNode*> get_third_neighbors(QuadTreeNode* node,
+                                               std::vector<QuadTreeNode*> leaves)
+{
+  using namespace std;
+  vector<QuadTreeNode*> nbrs;
+
+  if(node == nullptr || leaves.empty())
+    return nbrs;
+
+  return nbrs;
+}
+
 void enforce_corners(QuadTree* qt)
 {
   using namespace std;
@@ -163,12 +210,22 @@ void enforce_corners(QuadTree* qt)
   vector<QuadTreeNode*> pop_leaves = get_populated_leaves(qt);
 
   vector<QuadTreeNode*> test_nbrs = get_first_nbrs(pop_leaves[0], leaves);
-  cout << test_nbrs.size() << endl;
 
-  cout << pop_leaves[0]->GetId() << endl << "  ";
+  cout << test_nbrs.size() << " first neighbors" << endl;
   for(size_t i = 0; i < test_nbrs.size(); ++i) {
     cout << test_nbrs[i]->GetId() << " ";
+    test_nbrs[i]->SetColor(glm::vec3(0, 1, 0));
   }
+  cout << endl;
 
+  test_nbrs = get_second_neighbors(pop_leaves[0], leaves);
+
+  pop_leaves[0]->SetColor(glm::vec3(0, 0, 1));
+
+  cout << test_nbrs.size() << " second neighbors" << endl;
+  for(size_t i = 0; i < test_nbrs.size(); ++i) {
+    cout << test_nbrs[i]->GetId() << " ";
+    test_nbrs[i]->SetColor(glm::vec3(1, 1, 0));
+  }
   cout << endl;
 }

@@ -15,11 +15,13 @@ QuadTreeNode::QuadTreeNode()
 QuadTreeNode::QuadTreeNode(BBox* box,
                            size_t max_npoints,
                            NODE_TYPE nt,
+                           glm::vec3 color,
                            std::vector<glm::vec2> p) :
   bbox(box), node_type(nt), points(p), max_points(max_npoints)
 {
   id = g_quad_node_id++;
   depth = 0;
+  m_color = color;
   parent = nullptr;
   memset(children, 0, sizeof(QuadTreeNode*) * 4);
 }
@@ -78,7 +80,7 @@ void QuadTreeNode::Split()
   }
 
   for(int i = 0; i < 4; ++i) {
-    children[i] = new QuadTreeNode(bbox_quads[i], max_points, (NODE_TYPE)i, p_quads[i]);
+    children[i] = new QuadTreeNode(bbox_quads[i], max_points, (NODE_TYPE)i, m_color, p_quads[i]);
     children[i]->SetDepth(GetDepth() + 1);
     children[i]->SetParent(this);
   }
@@ -139,6 +141,8 @@ std::vector<glm::vec2> QuadTreeNode::GetPointsInRange(BBox* range)
 void QuadTreeNode::draw()
 {
   std::array<glm::vec2, 4> corners;
+
+  glColor3f(m_color.r, m_color.g, m_color.b);
 
   for(int i = 0; i < 4; ++i)
     corners[i] = bbox->GetCorner(i);

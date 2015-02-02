@@ -31,6 +31,7 @@ public:
   QuadTreeNode(BBox* box,
                size_t max_npoints = 64,
                NODE_TYPE nt = ROOT,
+               glm::vec3 color = glm::vec3(1, 0, 0),
                std::vector<glm::vec2> p = std::vector<glm::vec2>());
 
   virtual ~QuadTreeNode();
@@ -90,6 +91,16 @@ public:
     return node_type;
   }
 
+  glm::vec3 GetColor()
+  {
+    return m_color;
+  }
+
+  void SetColor(glm::vec3 c)
+  {
+    m_color = c;
+  }
+
   QuadTreeNode* FindNeighbor(NBR_DIR dir);
   void draw();
   void delEmptyLeaves();
@@ -102,6 +113,7 @@ private:
   NODE_TYPE node_type;
   QuadTreeNode* children[4];
   QuadTreeNode* parent;
+  glm::vec3 m_color;
   std::vector<glm::vec2> points;
 
   QuadTreeNode* north_nbr(QuadTreeNode *node);
