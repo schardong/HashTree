@@ -106,8 +106,10 @@ void mouse_click(int button, int state, int x, int y)
   }
 }
 
-void keyboard_down(unsigned char c, int, int)
+void key_press(unsigned char c, int, int)
 {
+  printf("%d %c\n", c, c);
+
   switch(c) {
   case 27: //ESC
     glutDestroyWindow(win_id);
@@ -116,17 +118,22 @@ void keyboard_down(unsigned char c, int, int)
     exit(0);
     break;
   case 32: //SPACEBAR
-    cout << "balancing!\n";
     balance_tree(qt);
-    //qt->BalanceTree();
-    break;
-  case GLUT_KEY_F1:
-    enforce_corners(qt);
-    //qt->EnforceCornerCond();
     break;
   }
 
   glutPostRedisplay();
+}
+
+void key_press_special(int c, int, int)
+{
+  printf("%d %c\n", c, c);
+
+  switch(c) {
+  case GLUT_KEY_F1:
+    enforce_corners(qt);
+    break;
+  }
 }
 
 int main(int argc, char** argv)
@@ -140,7 +147,8 @@ int main(int argc, char** argv)
   //glutIdleFunc(display);
   glutReshapeFunc(reshape);
   glutMouseFunc(mouse_click);
-  glutKeyboardFunc(keyboard_down);
+  glutKeyboardFunc(key_press);
+  glutSpecialFunc(key_press_special);
 
   initGL();
   glutMainLoop();

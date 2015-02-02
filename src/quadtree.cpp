@@ -1,5 +1,6 @@
 #include "quadtree.h"
 #include "quadtreenode.h"
+#include <iostream>
 
 QuadTree::QuadTree(BBox* bbox, size_t num_points_node) :
   m_num_points(0),
@@ -106,13 +107,15 @@ bool leaf_comp(QuadTreeNode* a, QuadTreeNode* b)
   return a->GetNumPoints() > b->GetNumPoints();
 }
 
-void enforce_corners(QuadTree* qt)
+std::vector<QuadTreeNode*> get_populated_leaves(QuadTree* qt)
 {
   using namespace std;
-  if(qt == nullptr)
-    return;
+  vector<QuadTreeNode*> leaves;
 
-  vector<QuadTreeNode*> leaves = qt->GetLeaves();
+  if(qt == nullptr)
+    return leaves;
+
+  leaves = qt->GetLeaves();
 
   //Sorting the leaves by the number of points in them.
   sort(leaves.begin(), leaves.end(), leaf_comp);
@@ -125,6 +128,47 @@ void enforce_corners(QuadTree* qt)
 
   //Removing the empty leaves from the set.
   leaves.erase(it, leaves.end());
+  return leaves;
+}
 
+std::vector<QuadTreeNode*> get_first_nbrs(QuadTreeNode* node,
+                                          std::vector<QuadTreeNode*> leaves)
+{
+  using namespace std;
+  vector<QuadTreeNode*> nbrs;
 
+  if(node == nullptr || leaves.empty())
+    return nbrs;
+
+  BBox* node_box = node->GetBBox();
+  for(size_t i = 0; i < leaves.size(); ++i) {
+    if(node == leaves[i])
+      continue;
+
+    BBox* leaf_box = leaves[i]->GetBBox();
+    if(leaf_box->Intersect(*node_box))
+      nbrs.push_back(leaves[i]);
+  }
+
+  return nbrs;
+}
+
+void enforce_corners(QuadTree* qt)
+{
+  using namespace std;
+  if(qt == nullptr)
+    return;
+
+  vector<QuadTreeNode*> leaves = qt->GetLeaves();
+  vector<QuadTreeNode*> pop_leaves = get_populated_leaves(qt);
+
+  vector<QuadTreeNode*> test_nbrs = get_first_nbrs(pop_leaves[0], leaves);
+  cout << test_nbrs.size() << endl;
+
+  cout << pop_leaves[0]->GetId() << endl << "  ";
+  for(size_t i = 0; i < test_nbrs.size(); ++i) {
+    cout << test_nbrs[i]->GetId() << " ";
+  }
+
+  cout << endl;
 }
