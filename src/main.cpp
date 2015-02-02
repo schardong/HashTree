@@ -117,10 +117,12 @@ void keyboard_down(unsigned char c, int, int)
     break;
   case 32: //SPACEBAR
     cout << "balancing!\n";
-    qt->BalanceTree();
+    balance_tree(qt);
+    //qt->BalanceTree();
     break;
   case GLUT_KEY_F1:
-    qt->EnforceCornerCond();
+    enforce_corners(qt);
+    //qt->EnforceCornerCond();
     break;
   }
 
@@ -134,7 +136,8 @@ int main(int argc, char** argv)
   glutInitWindowPosition(50, 50);
   win_id = glutCreateWindow("Viewport Transform");
   glutDisplayFunc(display);
-  glutIdleFunc(display);
+  //ADD-THIS-LATER!
+  //glutIdleFunc(display);
   glutReshapeFunc(reshape);
   glutMouseFunc(mouse_click);
   glutKeyboardFunc(keyboard_down);

@@ -35,8 +35,7 @@ public:
     return root_node;
   }
 
-  void BalanceTree();
-  void EnforceCornerCond();
+  std::vector<QuadTreeNode*> GetLeaves();
   void draw();
   void delEmptyLeaves(); //tmp method
 
@@ -46,5 +45,8 @@ private:
   int depth;
   QuadTreeNode* root_node;
 };
+
+void balance_tree(QuadTree*);
+void enforce_corners(QuadTree*);
 
 #endif // QUADTREE_H

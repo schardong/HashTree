@@ -154,7 +154,6 @@ void QuadTreeNode::draw()
     for(int i = 0; i < 4; ++i)
       if(children[i])
         children[i]->draw();
-
 }
 
 void QuadTreeNode::delEmptyLeaves()
@@ -198,7 +197,7 @@ QuadTreeNode* QuadTreeNode::FindNeighbor(NBR_DIR dir)
   return nullptr;
 }
 
-void QuadTreeNode::BalanceTree()
+/*void QuadTreeNode::BalanceTree()
 {
   using namespace std;
   vector<QuadTreeNode*> leaves = queue_leaves();
@@ -226,19 +225,19 @@ void QuadTreeNode::BalanceTree()
     }
 
   }
-}
+}*/
 
-void QuadTreeNode::EnforceCornerCond()
+/*void QuadTreeNode::EnforceCornerCond()
 {
-  /*If p is a single point and the angle \alpha of the edges that meet at p is < 60º:
-      Then the bounding box B containing p and its first neighbors must have the same size.
-    Else if \alpha is > 60º then:
-      Then B and its first, second an third neighbors must be of the same size.*/
+  //If p is a single point and the angle \alpha of the edges that meet at p is < 60º:
+  //  Then the bounding box B containing p and its first neighbors must have the same size.
+  //Else if \alpha is > 60º then:
+  //  Then B and its first, second an third neighbors must be of the same size.
 
   using namespace std;
 
   vector<QuadTreeNode*> leaves = queue_leaves();
-}
+}*/
 
 QuadTreeNode *QuadTreeNode::north_nbr(QuadTreeNode* node)
 {
@@ -300,7 +299,7 @@ QuadTreeNode *QuadTreeNode::west_nbr(QuadTreeNode *node)
   return (node->GetNodeType() == NW ? tmp->GetChild(NE) : tmp->GetChild(SE));
 }
 
-std::vector<QuadTreeNode *> QuadTreeNode::queue_leaves()
+/*std::vector<QuadTreeNode *> QuadTreeNode::queue_leaves()
 {
   using namespace std;
   vector<QuadTreeNode*> leaves;
@@ -348,14 +347,18 @@ std::vector<QuadTreeNode *> QuadTreeNode::get_first_nbrs(QuadTreeNode *node, std
       }
     }
   }
+
+  return nbrs;
 }
 
 std::vector<QuadTreeNode *> QuadTreeNode::get_second_nbrs(QuadTreeNode *node, std::vector<QuadTreeNode*> leaves)
 {
-
+  using namespace std;
+  return vector<QuadTreeNode*>();
 }
 
 std::vector<QuadTreeNode *> QuadTreeNode::get_third_nbrs(QuadTreeNode *node, std::vector<QuadTreeNode*> leaves)
 {
-
-}
+  using namespace std;
+  return vector<QuadTreeNode*>();
+}*/
