@@ -262,8 +262,28 @@ void enforce_corners(QuadTree* qt)
         if(curr_d < max_d)
           fst_nbrs[i]->Split();
       }
-    }
-    else {
+    } else {
+      vector<QuadTreeNode*> nbrs = get_first_nbrs(*it, leaves);
+      nbrs.push_back(*it);
+
+      vector<QuadTreeNode*> s_nbrs  = get_second_neighbors(*it, leaves);
+      nbrs.insert(nbrs.end(), s_nbrs.begin(), s_nbrs.end());
+
+      vector<QuadTreeNode*> t_nbrs  = get_third_neighbors(*it, leaves);
+      nbrs.insert(nbrs.end(), t_nbrs.begin(), t_nbrs.end());
+
+      int max_d = nbrs[0]->GetDepth();
+      for(size_t i = 1; i < nbrs.size(); ++i) {
+        int curr_d = nbrs[i]->GetDepth();
+        if(curr_d > max_d)
+          max_d = curr_d;
+      }
+
+      for(size_t i = 0; i < nbrs.size(); ++i) {
+        int curr_d = nbrs[i]->GetDepth();
+        if(curr_d < max_d)
+          nbrs[i]->Split();
+      }
     }
   }
 
