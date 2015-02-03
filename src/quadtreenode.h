@@ -2,6 +2,7 @@
 #define QUADTREENODE_H
 
 #include "bbox.h"
+#include "edge.h"
 #include <vector>
 #include <queue>
 #include <glm/glm.hpp>
@@ -32,7 +33,7 @@ public:
                size_t max_npoints = 64,
                NODE_TYPE nt = ROOT,
                glm::vec3 color = glm::vec3(1, 0, 0),
-               std::vector<glm::vec2> p = std::vector<glm::vec2>());
+               std::vector<Vertex*> p = std::vector<Vertex*>());
 
   virtual ~QuadTreeNode();
 
@@ -42,12 +43,18 @@ public:
   }
 
   virtual void Split();
-  virtual int AddPoint(glm::vec2 p);
-  virtual std::vector<glm::vec2> GetPointsInRange(BBox* range);
+  virtual int AddPoint(Vertex* p);
+  virtual std::vector<Vertex*> GetPointsInRange(BBox* range);
 
   size_t GetNumPoints()
   {
     return points.size();
+  }
+
+  Vertex* GetVertex(size_t i)
+  {
+    assert(i < points.size());
+    return points[i];
   }
 
   size_t GetId()
@@ -114,7 +121,7 @@ private:
   QuadTreeNode* children[4];
   QuadTreeNode* parent;
   glm::vec3 m_color;
-  std::vector<glm::vec2> points;
+  std::vector<Vertex*> points;
 
   QuadTreeNode* north_nbr(QuadTreeNode *node);
   QuadTreeNode* south_nbr(QuadTreeNode *node);

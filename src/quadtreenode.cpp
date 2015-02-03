@@ -16,7 +16,7 @@ QuadTreeNode::QuadTreeNode(BBox* box,
                            size_t max_npoints,
                            NODE_TYPE nt,
                            glm::vec3 color,
-                           std::vector<glm::vec2> p) :
+                           std::vector<Vertex*> p) :
   bbox(box), node_type(nt), points(p), max_points(max_npoints)
 {
   id = g_quad_node_id++;
@@ -50,7 +50,7 @@ void QuadTreeNode::Split()
   if(!IsLeaf())
     return;
 
-  vector<vec2> p_quads[4];
+  vector<Vertex*> p_quads[4];
   array<BBox*, 4> bbox_quads;
   BBox* box = (BBox*) bbox;
 
@@ -72,7 +72,7 @@ void QuadTreeNode::Split()
 
   for(auto it = points.begin(); it != points.end(); ++it) {
     for(size_t i = 0; i < 4; ++i) {
-      if(bbox_quads[i]->PointInBox(*it)) {
+      if(bbox_quads[i]->PointInBox((*it)->p)) {
         p_quads[i].push_back(*it);
         break;
       }
@@ -87,9 +87,9 @@ void QuadTreeNode::Split()
   points.clear();
 }
 
-int QuadTreeNode::AddPoint(glm::vec2 p)
+int QuadTreeNode::AddPoint(Vertex* p)
 {
-  if(!bbox->PointInBox(p))
+  if(!bbox->PointInBox(p->p))
     return -1;
 
   if(IsLeaf()) {
@@ -103,7 +103,7 @@ int QuadTreeNode::AddPoint(glm::vec2 p)
 
   int res_depth = GetDepth();
   for(size_t i = 0; i < 4; ++i) {
-    if(children[i]->GetBBox()->PointInBox(p)) {
+    if(children[i]->GetBBox()->PointInBox(p->p)) {
       int d = children[i]->AddPoint(p);
       res_depth = d > res_depth? d : res_depth;
     }
@@ -112,25 +112,25 @@ int QuadTreeNode::AddPoint(glm::vec2 p)
   return res_depth;
 }
 
-std::vector<glm::vec2> QuadTreeNode::GetPointsInRange(BBox* range)
+std::vector<Vertex*> QuadTreeNode::GetPointsInRange(BBox* range)
 {
   using std::vector;
   using glm::vec2;
 
-  vector<vec2> p_range;
+  vector<Vertex*> p_range;
 
   if(!range->Intersect(*GetBBox()))
     return p_range;
 
   if(IsLeaf()) {
     for(auto it = points.begin(); it != points.end(); it++)
-      if(range->PointInBox(*it))
+      if(range->PointInBox((*it)->p))
         p_range.push_back(*it);
     return p_range;
   }
 
   for(size_t i = 0; i < 4; ++i) {
-    vector<vec2> tmp = children[i]->GetPointsInRange(range);
+    vector<Vertex*> tmp = children[i]->GetPointsInRange(range);
     if(!tmp.empty())
       p_range.insert(p_range.end(), tmp.begin(), tmp.end());
   }

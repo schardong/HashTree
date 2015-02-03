@@ -18,7 +18,7 @@ QuadTree::~QuadTree()
   root_node = nullptr;
 }
 
-bool QuadTree::AddPoint(glm::vec2 p)
+bool QuadTree::AddPoint(Vertex* p)
 {
   int r_depth = root_node->AddPoint(p);
   if(r_depth == -1)
@@ -28,7 +28,7 @@ bool QuadTree::AddPoint(glm::vec2 p)
   return true;
 }
 
-std::vector<glm::vec2> QuadTree::GetPointsInRange(BBox *range)
+std::vector<Vertex*> QuadTree::GetPointsInRange(BBox *range)
 {
   return root_node->GetPointsInRange(range);
 }
@@ -228,13 +228,51 @@ std::vector<QuadTreeNode*> get_third_neighbors(QuadTreeNode* node,
 void enforce_corners(QuadTree* qt)
 {
   using namespace std;
+  using namespace glm;
+
   if(qt == nullptr)
     return;
 
   vector<QuadTreeNode*> leaves = qt->GetLeaves();
   vector<QuadTreeNode*> pop_leaves = get_populated_leaves(qt);
 
-  pop_leaves[0]->SetColor(glm::vec3(0, 0, 1));
+  for(auto it = pop_leaves.begin(); it != pop_leaves.end(); ++it) {
+    Vertex* v = (*it)->GetVertex(0);
+    vec2 v1, v2;
+
+    Edge* e1 = v->edges[0];
+    Edge* e2 = v->edges[1];
+    
+    v1 = normalize(e1->v->p - e1->u->p);
+    v2 = normalize(e2->v->p - e2->u->p);
+
+    if(degrees(acos(dot(v1, v2))) <= 60) {
+      vector<QuadTreeNode*> fst_nbrs = get_first_nbrs(*it, leaves);
+      fst_nbrs.push_back(*it);
+
+      int max_d = fst_nbrs[0]->GetDepth();
+      for(size_t i = 1; i < fst_nbrs.size(); ++i) {
+        int curr_d = fst_nbrs[i]->GetDepth();
+        if(curr_d > max_d)
+          max_d = curr_d;
+      }
+
+      for(size_t i = 0; i < fst_nbrs.size(); ++i) {
+        int curr_d = fst_nbrs[i]->GetDepth();
+        if(curr_d < max_d)
+          fst_nbrs[i]->Split();
+      }
+    }
+    else {
+    }
+  }
+
+
+
+
+
+
+  /*pop_leaves[0]->SetColor(glm::vec3(0, 0, 1));
 
   vector<QuadTreeNode*> test_nbrs = get_first_nbrs(pop_leaves[0], leaves);
   cout << test_nbrs.size() << " first neighbors" << endl;
@@ -258,5 +296,6 @@ void enforce_corners(QuadTree* qt)
     cout << test_nbrs[i]->GetId() << " ";
     test_nbrs[i]->SetColor(glm::vec3(0, 1, 1));
   }
-  cout << endl;
+  cout << endl;*/
 }
+

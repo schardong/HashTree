@@ -5,16 +5,12 @@
 #include <map>
 
 #include "quadtree.h"
+#include "edge.h"
 
 #include <GL/glut.h>
 
-using std::cout;
-using std::endl;
-using std::array;
-using std::vector;
-using std::pair;
-using glm::vec2;
-using glm::vec3;
+using namespace std;
+using namespace glm;
 
 static int WIN_WIDTH = 800;
 static int WIN_HEIGHT = 800;
@@ -22,30 +18,15 @@ static int win_id = -1;
 
 QuadTree* qt;
 
-vector<vec2> points;
-vector<pair<int, int> > edges;
+vector<Vertex*> points;
+vector<Edge*> edges;
+int g_vertex_id = 0;
 
 void initGL()
 {
   array<vec2, 4> v0 = {vec2(0, 0.1), vec2(0.8, 0.1), vec2(1, 0.9), vec2(0.2, 0.9)};
   BBox* r0 = new BBox(v0);
   qt = new QuadTree(r0, 1);
-
-//  points.push_back(vec2(0.3, 0.3));
-//  points.push_back(vec2(0.3, 0.8));
-//  points.push_back(vec2(0.4, 0.8));
-//  points.push_back(vec2(0.5, 0.4));
-//  points.push_back(vec2(0.6, 0.4));
-//  points.push_back(vec2(0.7, 0.4));
-//  points.push_back(vec2(0.8, 0.4));
-
-//  points.push_back(vec2(0.7, 0.6));
-//  points.push_back(vec2(0.75, 0.6));
-//  points.push_back(vec2(0.8, 0.8));
-//  points.push_back(vec2(0.85, 0.8));
-
-//  for(size_t i = 0; i < points.size(); ++i)
-//    qt->AddPoint(points[i]);
 
   glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
   glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -61,13 +42,15 @@ void display()
   glColor3f(0, 1, 0);
   glBegin(GL_POINTS);
   for(size_t i = 0; i < points.size(); ++i)
-    glVertex2f(points[i].x, points[i].y);
+    glVertex2f(points[i]->p.x, points[i]->p.y);
   glEnd();
 
   glColor3f(0, 1, 1);
-  glBegin(GL_LINE_LOOP);
-  for(size_t i = 0; i < points.size(); ++i) {
-    glVertex2f(points[i].x, points[i].y);
+
+  glBegin(GL_LINES);
+  for(size_t i = 0; i < edges.size(); ++i) {
+    glVertex2f(edges[i]->u->p.x, edges[i]->u->p.y);
+    glVertex2f(edges[i]->v->p.x, edges[i]->v->p.y);
   }
   glEnd();
 
@@ -100,13 +83,10 @@ void mouse_click(int button, int state, int x, int y)
     {
     case GLUT_LEFT_BUTTON:
     default:
-      vec2 p;
-      p = vec2(x / (float)WIN_WIDTH, (WIN_HEIGHT - y) / (float)WIN_HEIGHT);
-      if(qt->AddPoint(p)) {
-        points.push_back(p);
-        edges.push_back(pair<int, int>(points.size() - 2, points.size() - 1));
-        edges.push_back(pair<int, int>(points.size() - 1, points.size() - 2));
-      }
+      Vertex* v = new Vertex(vec2(x / (float)WIN_WIDTH, (WIN_HEIGHT - y) / (float)WIN_HEIGHT));
+      v->id = g_vertex_id++;
+      if(qt->AddPoint(v))
+        points.push_back(v);
       break;
     }
   }
@@ -121,10 +101,25 @@ void key_press(unsigned char c, int, int)
     glutDestroyWindow(win_id);
     delete qt;
     qt = nullptr;
+
+    for(size_t i = 0; i < points.size(); ++i) {
+      memset(points[i], 0, sizeof(Vertex));
+      delete points[i];
+      points[i] = nullptr;
+    }
+
+    for(size_t i = 0; i < edges.size(); ++i) {
+      memset(edges[i], 0, sizeof(Edge));
+      delete edges[i];
+      edges[i] = nullptr;
+    }
+
+    points.clear();
+    edges.clear();
+
     exit(0);
     break;
   case 32: //SPACEBAR
-    balance_tree(qt);
     break;
   }
 
@@ -137,9 +132,42 @@ void key_press_special(int c, int, int)
 
   switch(c) {
   case GLUT_KEY_F1:
+    balance_tree(qt);
+    break;
+  case GLUT_KEY_F2:
+    for(size_t i = 0; i < points.size(); ++i) {
+      points[i]->edges.clear();
+    }
+
+    for(size_t i = 0; i < edges.size(); ++i) {
+      memset(edges[i], 0, sizeof(Edge));
+      delete edges[i];
+      edges[i] = nullptr;
+    }
+    edges.clear();
+    
+    size_t sz = points.size();
+    for(size_t i = 1; i <= points.size(); ++i) {
+      size_t idx1 = (i-1) % sz;
+      size_t idx2 = i % sz;
+      Edge* e1 = new Edge(points[idx1], points[idx2]);
+      points[idx1]->edges.push_back(e1);
+      edges.push_back(e1);
+    }
+
+    for(size_t i = 1; i <= points.size(); ++i) {
+      size_t idx1 = (i-1) % sz;
+      size_t idx2 = i % sz;
+      Edge* e1 = new Edge(points[idx2], points[idx1]);
+      points[idx2]->edges.push_back(e1);
+      edges.push_back(e1);
+    }
+
     enforce_corners(qt);
     break;
   }
+
+  glutPostRedisplay();
 }
 
 int main(int argc, char** argv)

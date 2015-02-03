@@ -1,13 +1,30 @@
 #ifndef EDGE_H
 #define EDGE_H
 
+#include <vector>
+#include <glm/glm.hpp>
+
+class Edge;
+
+class Vertex
+{
+public:
+  int id;
+  glm::vec2 p;
+  std::vector<Edge*> edges;
+
+  Vertex(glm::vec2 p1 = glm::vec2(0)) :
+    p(p1)
+  {}
+};
+
 class Edge
 {
 public:
-  vec2* u;
-  vec2* v;
+  Vertex* u;
+  Vertex* v;
 
-  Edge(vec2* u1, vec2* v1) :
+  Edge(Vertex* u1 = nullptr, Vertex* v1 = nullptr) :
     u(u1), v(v1)
   {}
 };
