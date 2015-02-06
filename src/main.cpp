@@ -178,7 +178,7 @@ int main(int argc, char** argv)
   win_id = glutCreateWindow("Viewport Transform");
   glutDisplayFunc(display);
   //ADD-THIS-LATER!
-  //glutIdleFunc(display);
+  glutIdleFunc(display);
   glutReshapeFunc(reshape);
   glutMouseFunc(mouse_click);
   glutKeyboardFunc(key_press);
