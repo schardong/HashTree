@@ -274,7 +274,8 @@ void enforce_corners(QuadTree* qt)
     //This node was a leaf, but in the neighborhood of another leaf that demanded
     //its division.
     if(!(*it)->IsLeaf()) {
-
+      cout << "HEEEEEEEEEEEEEEEEEY!\n";
+      continue;
     }
 
     Vertex* v = (*it)->GetVertex(0);
@@ -291,14 +292,15 @@ void enforce_corners(QuadTree* qt)
       fst_nbrs.push_back(*it);
       split_nodes(fst_nbrs);
     } else {
-//      vector<QuadTreeNode*> nbrs = get_first_nbrs(*it, leaves);
-//      nbrs.push_back(*it);
+      vector<QuadTreeNode*> nbrs = get_first_nbrs(*it, leaves);
+      nbrs.push_back(*it);
 
-//      vector<QuadTreeNode*> s_nbrs  = get_second_neighbors(*it, leaves);
-//      nbrs.insert(nbrs.end(), s_nbrs.begin(), s_nbrs.end());
+      vector<QuadTreeNode*> s_nbrs  = get_second_neighbors(*it, leaves);
+      nbrs.insert(nbrs.end(), s_nbrs.begin(), s_nbrs.end());
 
-//      vector<QuadTreeNode*> t_nbrs  = get_third_neighbors(*it, leaves);
-//      nbrs.insert(nbrs.end(), t_nbrs.begin(), t_nbrs.end());
+      vector<QuadTreeNode*> t_nbrs  = get_third_neighbors(*it, leaves);
+      nbrs.insert(nbrs.end(), t_nbrs.begin(), t_nbrs.end());
+      split_nodes(nbrs);
 
 //      int max_d = nbrs[0]->GetDepth();
 //      for(size_t i = 1; i < nbrs.size(); ++i) {
