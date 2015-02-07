@@ -229,6 +229,7 @@ bool node_depth_comp(QuadTreeNode* a, QuadTreeNode* b)
 
 void split_nodes(std::vector<QuadTreeNode*> nodes)
 {
+  //Sorting the nodes by their depths.
   sort(nodes.begin(), nodes.end(), node_depth_comp);
 
   int max_depth = (*(nodes.end() - 1))->GetDepth();
@@ -238,6 +239,8 @@ void split_nodes(std::vector<QuadTreeNode*> nodes)
     if((*node_it)->GetDepth() == max_depth)
       break;
 
+  //Erasing any nodes with the largest depth so that we may include only the
+  //nodes that need to be split in a processing queue.
   nodes.erase(node_it, nodes.end());
 
   queue<QuadTreeNode*> node_q;
@@ -259,66 +262,82 @@ void split_nodes(std::vector<QuadTreeNode*> nodes)
   } while(!node_q.empty());
 }
 
+QuadTreeNode* track_pop_leaf(QuadTreeNode* root)
+{
+  if(!root)
+    return nullptr;
+
+  QuadTreeNode* node = nullptr;
+  queue<QuadTreeNode*> node_q;
+  node_q.push(root);
+
+  do {
+    QuadTreeNode* curr_node = node_q.front();
+    node_q.pop();
+
+    if(curr_node->IsLeaf() && curr_node->GetNumPoints() > 0)
+      node = curr_node;
+    else if(!curr_node->IsLeaf())
+      for(int i = 0; i < 4; ++i)
+        node_q.push(curr_node->GetChild(i));
+
+  } while(!node_q.empty() && !node);
+
+  return node;
+}
+
 void enforce_corners(QuadTree* qt)
 {
   if(qt == nullptr)
     return;
 
   vector<QuadTreeNode*> leaves = qt->GetLeaves();
-  vector<QuadTreeNode*> pop_leaves = get_populated_leaves(qt);
+  vector<QuadTreeNode*> tmp_pop_leaves = get_populated_leaves(qt);
+  queue<QuadTreeNode*> pop_leaves;
 
-  //BUG: When the refinement occurs, some populated leaf nodes will be split,
-  //leading to inconsistensy in the structure and segfaults.
-  for(auto it = pop_leaves.begin(); it != pop_leaves.end(); ++it) {
+  for(size_t i = 0; i < tmp_pop_leaves.size(); ++i)
+    pop_leaves.push(tmp_pop_leaves[i]);
+
+  do {
+    QuadTreeNode* curr_node = pop_leaves.front();
+    pop_leaves.pop();
 
     //This node was a leaf, but in the neighborhood of another leaf that demanded
     //its division.
-    if(!(*it)->IsLeaf()) {
-      cout << "HEEEEEEEEEEEEEEEEEY!\n";
+    if(!curr_node->IsLeaf()) {
+      QuadTreeNode* pop_leaf = track_pop_leaf(curr_node);
+      pop_leaves.push(pop_leaf);
       continue;
     }
 
-    Vertex* v = (*it)->GetVertex(0);
+    Vertex* v = curr_node->GetVertex(0);
     vec2 v1, v2;
 
     Edge* e1 = v->edges[0];
     Edge* e2 = v->edges[1];
-    
+
     v1 = normalize(e1->v->p - e1->u->p);
     v2 = normalize(e2->v->p - e2->u->p);
 
+    //If the angle between the edges of a vertex is less than 60 degrees, we
+    //must check and eventualy split the node's first neighbors. Else, we must
+    //do the same, but with the second and third neighbors as well.
     if(degrees(acos(dot(v1, v2))) <= 60) {
-      vector<QuadTreeNode*> fst_nbrs = get_first_nbrs(*it, leaves);
-      fst_nbrs.push_back(*it);
+      vector<QuadTreeNode*> fst_nbrs = get_first_nbrs(curr_node, leaves);
+      fst_nbrs.push_back(curr_node);
       split_nodes(fst_nbrs);
     } else {
-      vector<QuadTreeNode*> nbrs = get_first_nbrs(*it, leaves);
-      nbrs.push_back(*it);
+      vector<QuadTreeNode*> nbrs = get_first_nbrs(curr_node, leaves);
+      nbrs.push_back(curr_node);
 
-      vector<QuadTreeNode*> s_nbrs  = get_second_neighbors(*it, leaves);
+      vector<QuadTreeNode*> s_nbrs  = get_second_neighbors(curr_node, leaves);
       nbrs.insert(nbrs.end(), s_nbrs.begin(), s_nbrs.end());
 
-      vector<QuadTreeNode*> t_nbrs  = get_third_neighbors(*it, leaves);
+      vector<QuadTreeNode*> t_nbrs  = get_third_neighbors(curr_node, leaves);
       nbrs.insert(nbrs.end(), t_nbrs.begin(), t_nbrs.end());
       split_nodes(nbrs);
-
-//      int max_d = nbrs[0]->GetDepth();
-//      for(size_t i = 1; i < nbrs.size(); ++i) {
-//        int curr_d = nbrs[i]->GetDepth();
-//        if(curr_d > max_d)
-//          max_d = curr_d;
-//      }
-
-//      for(size_t i = 0; i < nbrs.size(); ++i) {
-//        int curr_d = nbrs[i]->GetDepth();
-//        if(curr_d < max_d)
-//          nbrs[i]->Split();
-//      }
     }
-  }
 
-
-
-
+  } while(!pop_leaves.empty());
 }
 
