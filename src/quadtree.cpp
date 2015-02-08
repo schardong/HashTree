@@ -75,8 +75,7 @@ std::vector<QuadTreeNode*> QuadTree::GetLeaves()
 ////////////////////////////////////////////////////////////////////////////////
 void balance_tree(QuadTree* qt)
 {
-  if(qt == nullptr)
-    return;
+  assert(qt != nullptr);
 
   vector<QuadTreeNode*> leaves = qt->GetLeaves();
 
@@ -264,8 +263,7 @@ void split_nodes(std::vector<QuadTreeNode*> nodes)
 
 QuadTreeNode* track_pop_leaf(QuadTreeNode* root)
 {
-  if(!root)
-    return nullptr;
+  assert(root != nullptr);
 
   QuadTreeNode* node = nullptr;
   queue<QuadTreeNode*> node_q;
@@ -288,8 +286,7 @@ QuadTreeNode* track_pop_leaf(QuadTreeNode* root)
 
 void enforce_corners(QuadTree* qt)
 {
-  if(qt == nullptr)
-    return;
+  assert(qt != nullptr);
 
   vector<QuadTreeNode*> leaves = qt->GetLeaves();
   vector<QuadTreeNode*> tmp_pop_leaves = get_populated_leaves(qt);
@@ -333,11 +330,49 @@ void enforce_corners(QuadTree* qt)
       vector<QuadTreeNode*> s_nbrs  = get_second_neighbors(curr_node, leaves);
       nbrs.insert(nbrs.end(), s_nbrs.begin(), s_nbrs.end());
 
-      vector<QuadTreeNode*> t_nbrs  = get_third_neighbors(curr_node, leaves);
-      nbrs.insert(nbrs.end(), t_nbrs.begin(), t_nbrs.end());
+//      vector<QuadTreeNode*> t_nbrs  = get_third_neighbors(curr_node, leaves);
+//      nbrs.insert(nbrs.end(), t_nbrs.begin(), t_nbrs.end());
       split_nodes(nbrs);
     }
 
   } while(!pop_leaves.empty());
 }
 
+bool pnpoly(glm::vec2 point, std::vector<Vertex*> polygon)
+{
+  int i, j, nvert = polygon.size();
+  bool c = false;
+
+  for(i = 0, j = nvert - 1; i < nvert; j = i++) {
+    if(((polygon[i]->p.y >= point.y) != (polygon[j]->p.y >= point.y)) &&
+        (point.x <= (polygon[j]->p.x - polygon[i]->p.x) * (point.y - polygon[i]->p.y) / (polygon[j]->p.y - polygon[i]->p.y) + polygon[i]->p.x)
+      )
+      c = !c;
+  }
+
+  return c;
+}
+
+
+void delete_out_nodes(QuadTree* qt, vector<Vertex*> hull_vertices)
+{
+  assert(qt != nullptr && !hull_vertices.empty());
+
+  vector<QuadTreeNode*> leaves = qt->GetLeaves();
+
+  size_t l_sz = leaves.size();
+  for(size_t i = 0; i < l_sz; ++i) {
+    //For each leaf node, we get its bounding box and test if any of the points
+    //intersects the polygon formed by the domain. If if does not, we mark the
+    //leaf for deletion.
+
+    bool in_poly = false;
+    BBox* bbox = leaves[i]->GetBBox();
+    for(size_t j = 0; j < 4; ++j) {
+      in_poly = pnpoly(bbox->GetCorner(i), hull_vertices);
+      if(in_poly) cout << "in_poly is TRUE\n";
+    }
+
+  }
+
+}

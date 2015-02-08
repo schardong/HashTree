@@ -129,15 +129,15 @@ void key_press(unsigned char c, int, int)
 void key_press_special(int c, int, int)
 {
   printf("%d %c\n", c, c);
+  size_t sz = points.size();
 
   switch(c) {
   case GLUT_KEY_F1:
     balance_tree(qt);
     break;
   case GLUT_KEY_F2:
-    for(size_t i = 0; i < points.size(); ++i) {
+    for(size_t i = 0; i < sz; ++i)
       points[i]->edges.clear();
-    }
 
     for(size_t i = 0; i < edges.size(); ++i) {
       memset(edges[i], 0, sizeof(Edge));
@@ -145,9 +145,8 @@ void key_press_special(int c, int, int)
       edges[i] = nullptr;
     }
     edges.clear();
-    
-    size_t sz = points.size();
-    for(size_t i = 1; i <= points.size(); ++i) {
+
+    for(size_t i = 1; i <= sz; ++i) {
       size_t idx1 = (i-1) % sz;
       size_t idx2 = i % sz;
       Edge* e1 = new Edge(points[idx1], points[idx2]);
@@ -155,7 +154,7 @@ void key_press_special(int c, int, int)
       edges.push_back(e1);
     }
 
-    for(size_t i = 1; i <= points.size(); ++i) {
+    for(size_t i = 1; i <= sz; ++i) {
       size_t idx1 = (i-1) % sz;
       size_t idx2 = i % sz;
       Edge* e1 = new Edge(points[idx2], points[idx1]);
@@ -164,6 +163,10 @@ void key_press_special(int c, int, int)
     }
 
     enforce_corners(qt);
+    break;
+  case GLUT_KEY_F3:
+    //find and delete empty nodes.
+    delete_out_nodes(qt, points);
     break;
   }
 
