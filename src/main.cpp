@@ -22,11 +22,28 @@ vector<Vertex*> points;
 vector<Edge*> edges;
 int g_vertex_id = 0;
 
+#define LEFT 0.1f
+#define RIGHT 0.9f
+#define TOP 0.49f
+#define BOTTOM 0.001f
+
 void initGL()
 {
   array<vec2, 4> v0 = {vec2(0, 0.1), vec2(0.8, 0.1), vec2(1, 0.9), vec2(0.2, 0.9)};
-  BBox* r0 = new BBox(v0);
-  qt = new QuadTree(r0, 1);
+
+  array<vec2, 4> v1 = {vec2(LEFT, BOTTOM), vec2(RIGHT, BOTTOM), vec2(RIGHT, TOP), vec2(LEFT, TOP)};
+
+  BBox* r0 = new BBox(v1);
+  qt = new QuadTree(r0, 128);
+
+  for(float i = 0.1f; i < 0.7f; i += 0.0001f) {
+    vec2 v = vec2(i, i / (3 * i) + 0.1);
+    Vertex* v1 = new Vertex(v);
+    if(qt->AddPoint(v1))
+      points.push_back(new Vertex(v));
+    else
+      delete v1;
+  }  
 
   glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
   glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -73,7 +90,8 @@ void reshape(GLsizei width, GLsizei height)
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
 
-  gluOrtho2D(0, 1, 0, 1);
+  gluOrtho2D(LEFT, RIGHT, BOTTOM, TOP);
+  glutPostRedisplay();
 }
 
 void mouse_click(int button, int state, int x, int y)
@@ -90,6 +108,8 @@ void mouse_click(int button, int state, int x, int y)
       break;
     }
   }
+
+  glutPostRedisplay();
 }
 
 void key_press(unsigned char c, int, int)
@@ -181,7 +201,7 @@ int main(int argc, char** argv)
   win_id = glutCreateWindow("Viewport Transform");
   glutDisplayFunc(display);
   //ADD-THIS-LATER!
-  glutIdleFunc(display);
+  //glutIdleFunc(display);
   glutReshapeFunc(reshape);
   glutMouseFunc(mouse_click);
   glutKeyboardFunc(key_press);

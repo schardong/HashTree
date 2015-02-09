@@ -39,7 +39,7 @@ public:
 
   virtual bool IsLeaf()
   {
-    return (!children[0] && !children[1] && !children[2] && !children[3]);
+    return !(children[0] || children[1] || children[2] || children[3]);
   }
 
   virtual void Split();

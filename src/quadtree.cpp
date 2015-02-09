@@ -338,41 +338,90 @@ void enforce_corners(QuadTree* qt)
   } while(!pop_leaves.empty());
 }
 
-bool pnpoly(glm::vec2 point, std::vector<Vertex*> polygon)
+bool pnpoly(glm::vec2 point, std::vector<glm::vec2> hull_vertices)
 {
-  int i, j, nvert = polygon.size();
+  int i, j, nvert = hull_vertices.size();
   bool c = false;
 
-  for(i = 0, j = nvert - 1; i < nvert; j = i++) {
-    if(((polygon[i]->p.y >= point.y) != (polygon[j]->p.y >= point.y)) &&
-        (point.x <= (polygon[j]->p.x - polygon[i]->p.x) * (point.y - polygon[i]->p.y) / (polygon[j]->p.y - polygon[i]->p.y) + polygon[i]->p.x)
+  for(i = 0, j = nvert - 1; i < nvert; j = i++)
+    if(((hull_vertices[i].y >= point.y) != (hull_vertices[j].y >= point.y)) &&
+        (point.x <= (hull_vertices[j].x - hull_vertices[i].x) * (point.y - hull_vertices[i].y) / (hull_vertices[j].y - hull_vertices[i].y) + hull_vertices[i].x)
       )
       c = !c;
-  }
 
   return c;
 }
 
+queue<QuadTreeNode*> queue_out_leaves(vector<QuadTreeNode*> leaves,
+                                      vector<vec2> hull_vertices)
+{
+  //For each leaf node, we get its bounding box and test if any of the points
+  //intersects the polygon formed by the domain. If if does not, we mark the
+  //leaf for deletion by inserting it in a queue.
+  queue<QuadTreeNode*> to_del;
+
+  if(leaves.empty() || hull_vertices.empty())
+    return to_del;
+
+  size_t l_sz = leaves.size();
+  for(size_t i = 0; i < l_sz; ++i) {
+    BBox* bbox = leaves[i]->GetBBox();
+
+    bool a = pnpoly(bbox->GetCorner(0), hull_vertices);
+    bool b = pnpoly(bbox->GetCorner(1), hull_vertices);
+    bool c = pnpoly(bbox->GetCorner(2), hull_vertices);
+    bool d = pnpoly(bbox->GetCorner(3), hull_vertices);
+
+    if((a + b + c + d) <= 2)
+      to_del.push(leaves[i]);
+    /*if(!a && !b && !c && !d)
+      to_del.push(leaves[i]);*/
+  }
+
+  return to_del;
+}
 
 void delete_out_nodes(QuadTree* qt, vector<Vertex*> hull_vertices)
 {
   assert(qt != nullptr && !hull_vertices.empty());
 
+  vector<vec2> hull_coords;
+  size_t h_sz = hull_vertices.size();
+  for(size_t i = 0; i < h_sz; ++i)
+    hull_coords.push_back(hull_vertices[i]->p);
+
   vector<QuadTreeNode*> leaves = qt->GetLeaves();
+  queue<QuadTreeNode*> to_del = queue_out_leaves(leaves, hull_coords);
 
-  size_t l_sz = leaves.size();
-  for(size_t i = 0; i < l_sz; ++i) {
-    //For each leaf node, we get its bounding box and test if any of the points
-    //intersects the polygon formed by the domain. If if does not, we mark the
-    //leaf for deletion.
+  cout << "Number of leaves to be deleted: " << to_del.size() << endl;
 
-    bool in_poly = false;
-    BBox* bbox = leaves[i]->GetBBox();
-    for(size_t j = 0; j < 4; ++j) {
-      in_poly = pnpoly(bbox->GetCorner(i), hull_vertices);
-      if(in_poly) cout << "in_poly is TRUE\n";
+  //Ideally, we should test if any of the nodes to be deleted contain a vertex,
+  //if so, we can do a couple of things:
+  // 1) Don't delete the node;
+  // 2) Find the nearest node inside the domain, assign the vertex to it and
+  //    delete the first node.
+
+  do {
+    QuadTreeNode* curr_node = to_del.front();
+    to_del.pop();
+
+    QuadTreeNode* parent = curr_node->GetParent();
+
+    memset(curr_node, 0, sizeof(QuadTreeNode));
+    delete curr_node;
+    curr_node = nullptr;
+
+    if(parent->IsLeaf()) {
+      BBox* bbox = parent->GetBBox();
+
+      bool a = pnpoly(bbox->GetCorner(0), hull_coords);
+      bool b = pnpoly(bbox->GetCorner(1), hull_coords);
+      bool c = pnpoly(bbox->GetCorner(2), hull_coords);
+      bool d = pnpoly(bbox->GetCorner(3), hull_coords);
+
+      if((a + b + c + d) <= 2)
+        to_del.push(parent);
     }
-
-  }
+  } while(!to_del.empty());
 
 }

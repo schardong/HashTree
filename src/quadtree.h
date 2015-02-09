@@ -47,8 +47,9 @@ private:
   QuadTreeNode* root_node;
 };
 
+bool pnpoly(glm::vec2, std::vector<glm::vec2>);
 void balance_tree(QuadTree*);
 void enforce_corners(QuadTree*);
-void delete_out_nodes(QuadTree*, std::vector<Vertex *> hull_vertices);
+void delete_out_nodes(QuadTree*, std::vector<Vertex*>);
 
 #endif // QUADTREE_H

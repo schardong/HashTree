@@ -201,7 +201,7 @@ QuadTreeNode* QuadTreeNode::FindNeighbor(NBR_DIR dir)
   return nullptr;
 }
 
-QuadTreeNode *QuadTreeNode::north_nbr(QuadTreeNode* node)
+QuadTreeNode* QuadTreeNode::north_nbr(QuadTreeNode* node)
 {
   if(node->GetParent() == nullptr) //We arrived at the root.
     return nullptr;
@@ -216,7 +216,7 @@ QuadTreeNode *QuadTreeNode::north_nbr(QuadTreeNode* node)
   return ((node->GetNodeType() == NW) ? tmp->GetChild(SW) : tmp->GetChild(SE));
 }
 
-QuadTreeNode *QuadTreeNode::south_nbr(QuadTreeNode *node)
+QuadTreeNode* QuadTreeNode::south_nbr(QuadTreeNode *node)
 {
   if(node->GetParent() == nullptr) //We arrived at the root.
     return nullptr;
@@ -231,7 +231,7 @@ QuadTreeNode *QuadTreeNode::south_nbr(QuadTreeNode *node)
   return (node->GetNodeType() == SW ? tmp->GetChild(NW) : tmp->GetChild(NE));
 }
 
-QuadTreeNode *QuadTreeNode::east_nbr(QuadTreeNode *node)
+QuadTreeNode* QuadTreeNode::east_nbr(QuadTreeNode *node)
 {
   if(node->GetParent() == nullptr) //We arrived at the root.
     return nullptr;
@@ -246,7 +246,7 @@ QuadTreeNode *QuadTreeNode::east_nbr(QuadTreeNode *node)
   return (node->GetNodeType() == NE ? tmp->GetChild(NW) : tmp->GetChild(SW));
 }
 
-QuadTreeNode *QuadTreeNode::west_nbr(QuadTreeNode *node)
+QuadTreeNode* QuadTreeNode::west_nbr(QuadTreeNode *node)
 {
   if(node->GetParent() == nullptr) //We arrived at the root.
     return nullptr;
