@@ -3,6 +3,7 @@
 
 #include <glm/glm.hpp>
 #include <array>
+#include <gl/glut.h>
 
 class BBox
 {
@@ -46,6 +47,16 @@ public:
     if(i > 3)
       return m_corners[0];
     return m_corners[i];
+  }
+
+  void draw()
+  {
+    glBegin(GL_QUADS);
+      glVertex2f(m_corners[0].x, m_corners[0].y);
+      glVertex2f(m_corners[1].x, m_corners[1].y);
+      glVertex2f(m_corners[2].x, m_corners[2].y);
+      glVertex2f(m_corners[3].x, m_corners[3].y);
+    glEnd();
   }
 
 private:

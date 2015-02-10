@@ -6,6 +6,7 @@
 
 #include "quadtree.h"
 #include "edge.h"
+#include "mesh.h"
 
 #include <GL/glut.h>
 
@@ -16,7 +17,8 @@ static int WIN_WIDTH = 800;
 static int WIN_HEIGHT = 800;
 static int win_id = -1;
 
-QuadTree* qt;
+QuadTree* qt = nullptr;
+Mesh* g_mesh = nullptr;
 
 vector<Vertex*> points;
 vector<Edge*> edges;
@@ -61,7 +63,10 @@ void display()
   glEnd();
 
   glColor3f(1, 0, 0);
-  qt->draw();
+  if(g_mesh == nullptr)
+    qt->draw();
+  else
+    g_mesh->draw();
 
   glutSwapBuffers();
 }
@@ -175,7 +180,9 @@ void key_press_special(int c, int, int)
     break;
   case GLUT_KEY_F3:
     //find and delete empty nodes.
-    delete_out_nodes(qt, points);
+    g_mesh = new Mesh(qt);
+    g_mesh->SetBaseMesh(points);
+    //delete_out_nodes(qt, points);
     break;
   }
 

@@ -140,19 +140,8 @@ std::vector<Vertex*> QuadTreeNode::GetPointsInRange(BBox* range)
 
 void QuadTreeNode::draw()
 {
-  std::array<glm::vec2, 4> corners;
-
   glColor3f(m_color.r, m_color.g, m_color.b);
-
-  for(int i = 0; i < 4; ++i)
-    corners[i] = bbox->GetCorner(i);
-
-  glBegin(GL_QUADS);
-    glVertex2f(corners[0].x, corners[0].y);
-    glVertex2f(corners[1].x, corners[1].y);
-    glVertex2f(corners[2].x, corners[2].y);
-    glVertex2f(corners[3].x, corners[3].y);
-  glEnd();
+  bbox->draw();
 
   if(!IsLeaf())
     for(int i = 0; i < 4; ++i)

@@ -372,7 +372,7 @@ queue<QuadTreeNode*> queue_out_leaves(vector<QuadTreeNode*> leaves,
     bool c = pnpoly(bbox->GetCorner(2), hull_vertices);
     bool d = pnpoly(bbox->GetCorner(3), hull_vertices);
 
-    if((a + b + c + d) <= 2)
+    if((a + b + c + d) < 3)
       to_del.push(leaves[i]);
     /*if(!a && !b && !c && !d)
       to_del.push(leaves[i]);*/
@@ -406,10 +406,11 @@ void delete_out_nodes(QuadTree* qt, vector<Vertex*> hull_vertices)
     to_del.pop();
 
     QuadTreeNode* parent = curr_node->GetParent();
-
-    memset(curr_node, 0, sizeof(QuadTreeNode));
+    int node_type = curr_node->GetNodeType();
+    
     delete curr_node;
     curr_node = nullptr;
+    parent->SetChild(node_type, nullptr);
 
     if(parent->IsLeaf()) {
       BBox* bbox = parent->GetBBox();
@@ -419,7 +420,7 @@ void delete_out_nodes(QuadTree* qt, vector<Vertex*> hull_vertices)
       bool c = pnpoly(bbox->GetCorner(2), hull_coords);
       bool d = pnpoly(bbox->GetCorner(3), hull_coords);
 
-      if((a + b + c + d) <= 2)
+      if((a + b + c + d) < 3)
         to_del.push(parent);
     }
   } while(!to_del.empty());

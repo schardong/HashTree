@@ -73,6 +73,12 @@ public:
     return children[idx];
   }
 
+  void SetChild(int idx, void* val)
+  {
+    assert(idx >= 0 && idx <= 3);
+    children[idx] = (QuadTreeNode*)val;
+  }
+
   int GetDepth()
   {
     return depth;
