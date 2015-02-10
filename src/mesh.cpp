@@ -58,17 +58,25 @@ void Mesh::SetBaseMesh(vector<Vertex*> domain)
   leaves = queue_in_leaves(leaves, domain_vec, 4);
 
   size_t l_sz = leaves.size();
-
   for(size_t i = 0; i < l_sz; ++i) {
     BBox* box = leaves[i]->GetBBox();
     m_faces.push_back(box);
 
     for(size_t j = 0; j < 4; ++j)
       m_vertices.push_back(new Vertex(box->GetCorner(j)));
-    for(size_t j = 1; j <= 4; ++j) {
-      size_t idx1 = (j - 1) % 4;
-      size_t idx2 = j % 4;
-    }
+
+    Vertex* v1 = m_vertices[m_vertices.size() - 4];
+    Vertex* v2 = m_vertices[m_vertices.size() - 3];
+    Vertex* v3 = m_vertices[m_vertices.size() - 2];
+    Vertex* v4 = m_vertices[m_vertices.size() - 1];
+
+    m_edges.push_back(new Edge(v1, v2));
+    m_edges.push_back(new Edge(v2, v4));
+    m_edges.push_back(new Edge(v4, v1));
+
+    m_edges.push_back(new Edge(v2, v3));
+    m_edges.push_back(new Edge(v3, v4));
+    m_edges.push_back(new Edge(v4, v2));
   }
 }
 
@@ -79,9 +87,28 @@ void Mesh::Triangulate()
 
 void Mesh::draw()
 {
-  size_t f_sz = m_faces.size();
+  /*size_t f_sz = m_faces.size();
   for(size_t i = 0; i < f_sz; ++i) 
-    m_faces[i]->draw();
+    m_faces[i]->draw();*/
+
+  glColor3f(0, 1, 1);
+  size_t v_sz = m_vertices.size();
+  for(size_t i = 0; i < v_sz; ++i) {
+    glBegin(GL_POINTS);
+      glVertex2f(m_vertices[i]->p.x, m_vertices[i]->p.y);
+    glEnd();
+  }
+
+  glColor3f(1, 0, 0);
+  size_t e_sz = m_edges.size();
+  for(size_t i = 0; i < e_sz; ++i) {
+    Vertex* u = m_edges[i]->u;
+    Vertex* v = m_edges[i]->v;
+    glBegin(GL_LINES);
+      glVertex2f(u->p.x, u->p.y);
+      glVertex2f(v->p.x, v->p.y);
+    glEnd();
+  }
 }
 
 //bool vec_comp(Vertex a, Vertex b)
