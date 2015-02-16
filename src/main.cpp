@@ -3,6 +3,8 @@
 #include <array>
 #include <vector>
 #include <map>
+#include <cstdlib>
+#include <cstring>
 
 #include "quadtree.h"
 #include "edge.h"

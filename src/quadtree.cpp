@@ -3,6 +3,8 @@
 #include <iostream>
 #include <algorithm>
 #include <set>
+#include <cstdlib>
+#include <cstring>
 
 using namespace std;
 using namespace glm;
