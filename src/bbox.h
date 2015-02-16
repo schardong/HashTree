@@ -3,7 +3,7 @@
 
 #include <glm/glm.hpp>
 #include <array>
-#include <gl/glut.h>
+#include <GL/glut.h>
 
 class BBox
 {
