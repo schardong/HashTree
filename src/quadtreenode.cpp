@@ -115,13 +115,7 @@ int QuadTreeNode::AddPoint(Vertex* p)
       } else {
         Split();
       }
-    }
-
-
-
-
-
-    
+    }    
   }
 
   int res_depth = GetDepth();

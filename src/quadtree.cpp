@@ -70,6 +70,31 @@ std::vector<QuadTreeNode*> QuadTree::GetLeaves(int level)
   return leaves;
 }
 
+std::vector<QuadTreeNode*> QuadTree::GetUnconformingLeaves(int level)
+{
+  vector<QuadTreeNode*> lvl_leaves = GetLeaves(level);
+
+  if(lvl_leaves.empty())
+    return lvl_leaves;
+
+  vector<QuadTreeNode*> un_leaves;
+
+  size_t l_sz = lvl_leaves.size();
+  for(size_t i = 0; i < l_sz; ++i) {
+    for(int j = 0; i < 4; ++j) {
+      QuadTreeNode* nbr = lvl_leaves[i]->FindNeighbor((NBR_DIR)j);
+      if(nbr == nullptr)
+        continue;
+      if(!nbr->IsLeaf() || nbr->GetDepth() != GetDepth()) {
+        un_leaves.push_back(lvl_leaves[i]);
+        break;
+      }
+    }
+  }
+
+  return un_leaves;
+}
+
 std::vector<QuadTreeNode*> QuadTree::get_all_leaves()
 {
   vector<QuadTreeNode*> leaves;

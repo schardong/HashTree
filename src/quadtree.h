@@ -46,6 +46,7 @@ public:
   }
 
   std::vector<QuadTreeNode*> GetLeaves(int level = -1);
+  std::vector<QuadTreeNode*> GetUnconformingLeaves(int level);
   void draw();
 
 private:

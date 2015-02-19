@@ -85,6 +85,8 @@ void createTree()
 
   printf("%d %d %d %d\n", qt->GetLeaves(0).size(), qt->GetLeaves(1).size(), qt->GetLeaves(2).size(), qt->GetLeaves(3).size());
 
+  balance_tree(qt);
+  printf("unconforming leaves of level 2: %d\n", qt->GetUnconformingLeaves(2).size());
 
   /*for(int i = 0; i < 24; i += 3) {
     printf("(%d %d %d)\n", gimp_image[i], gimp_image[i+1], gimp_image[i+2]);
