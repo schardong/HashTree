@@ -40,7 +40,7 @@ public:
 
   virtual bool IsLeaf()
   {
-    return !(children[0] || children[1] || children[2] || children[3]);
+    return !(m_children[0] || m_children[1] || m_children[2] || m_children[3]);
   }
 
   virtual void Split();
@@ -49,13 +49,18 @@ public:
 
   size_t GetNumPoints()
   {
-    return points.size();
+    return m_points.size();
+  }
+
+  int GetMaxDepth()
+  {
+    return m_max_depth;
   }
 
   Vertex* GetVertex(size_t i)
   {
-    assert(i < points.size());
-    return points[i];
+    assert(i < m_points.size());
+    return m_points[i];
   }
 
   size_t GetId()
@@ -65,38 +70,38 @@ public:
 
   BBox* GetBBox()
   {
-    return bbox;
+    return m_box;
   }
 
   QuadTreeNode* GetChild(int idx)
   {
     assert(idx >= 0 && idx <= 3);
-    return children[idx];
+    return m_children[idx];
   }
 
   int GetDepth()
   {
-    return depth;
+    return m_depth;
   }
 
   void SetDepth(int d)
   {
-    depth = d;
+    m_depth = d;
   }
 
   QuadTreeNode* GetParent()
   {
-    return parent;
+    return m_parent;
   }
 
   void SetParent(QuadTreeNode* p)
   {
-    parent = p;
+    m_parent = p;
   }
 
   NODE_TYPE GetNodeType()
   {
-    return node_type;
+    return m_node_type;
   }
 
   glm::vec3 GetColor()
@@ -111,19 +116,18 @@ public:
 
   QuadTreeNode* FindNeighbor(NBR_DIR dir);
   void draw();
-  void delEmptyLeaves();
 
 private:
   size_t id;
-  size_t max_points;
-  int depth;
-  BBox* bbox;
-  NODE_TYPE node_type;
+  size_t m_max_points;
+  int m_depth;
+  BBox* m_box;
+  NODE_TYPE m_node_type;
   int m_max_depth;
-  QuadTreeNode* children[4];
-  QuadTreeNode* parent;
+  QuadTreeNode* m_children[4];
+  QuadTreeNode* m_parent;
   glm::vec3 m_color;
-  std::vector<Vertex*> points;
+  std::vector<Vertex*> m_points;
 
   QuadTreeNode* north_nbr(QuadTreeNode *node);
   QuadTreeNode* south_nbr(QuadTreeNode *node);

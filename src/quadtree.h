@@ -25,6 +25,11 @@ public:
     return m_max_points_node;
   }
 
+  int GetMaxDepth()
+  {
+    return m_max_depth;
+  }
+
   size_t GetNumPoints()
   {
     return m_num_points;
@@ -42,7 +47,6 @@ public:
 
   std::vector<QuadTreeNode*> GetLeaves(int level = -1);
   void draw();
-  void delEmptyLeaves(); //tmp method
 
 private:
   size_t m_max_points_node;
