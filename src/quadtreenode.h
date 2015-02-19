@@ -31,9 +31,10 @@ public:
 
   QuadTreeNode(BBox* box,
                size_t max_npoints = 64,
+               int max_depth = -1,
                NODE_TYPE nt = ROOT,
-               glm::vec3 color = glm::vec3(1, 0, 0),
-               std::vector<Vertex*> p = std::vector<Vertex*>());
+               std::vector<Vertex*> p = std::vector<Vertex*>(),
+               glm::vec3 color = glm::vec3(1, 0, 0));
 
   virtual ~QuadTreeNode();
 
@@ -118,6 +119,7 @@ private:
   int depth;
   BBox* bbox;
   NODE_TYPE node_type;
+  int m_max_depth;
   QuadTreeNode* children[4];
   QuadTreeNode* parent;
   glm::vec3 m_color;

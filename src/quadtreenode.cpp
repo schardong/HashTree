@@ -14,10 +14,11 @@ QuadTreeNode::QuadTreeNode()
 
 QuadTreeNode::QuadTreeNode(BBox* box,
                            size_t max_npoints,
+                           int max_depth,
                            NODE_TYPE nt,
-                           glm::vec3 color,
-                           std::vector<Vertex*> p) :
-  bbox(box), node_type(nt), points(p), max_points(max_npoints)
+                           std::vector<Vertex*> p,
+                           glm::vec3 color) :
+  bbox(box), m_max_depth(max_depth), node_type(nt), points(p), max_points(max_npoints)
 {
   id = g_quad_node_id++;
   depth = 0;
@@ -80,7 +81,7 @@ void QuadTreeNode::Split()
   }
 
   for(int i = 0; i < 4; ++i) {
-    children[i] = new QuadTreeNode(bbox_quads[i], max_points, (NODE_TYPE)i, m_color, p_quads[i]);
+    children[i] = new QuadTreeNode(bbox_quads[i], max_points, m_max_depth, (NODE_TYPE)i, p_quads[i], m_color);
     children[i]->SetDepth(GetDepth() + 1);
     children[i]->SetParent(this);
   }

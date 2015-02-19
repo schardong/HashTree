@@ -7,47 +7,70 @@
 using namespace std;
 using namespace glm;
 
-QuadTree::QuadTree(BBox* bbox, size_t num_points_node) :
+QuadTree::QuadTree(BBox* bbox, size_t num_points_node, int max_depth, std::vector<Vertex*> p) :
   m_num_points(0),
-  depth(0),
-  max_points_node(num_points_node)
+  m_depth(0),
+  m_max_depth(max_depth),
+  m_max_points_node(num_points_node)
 {
-  root_node = new QuadTreeNode(bbox, num_points_node);
+  m_root_node = new QuadTreeNode(bbox, num_points_node, max_depth, ROOT, p, glm::vec3(1, 0, 0));
 }
 
 QuadTree::~QuadTree()
 {
-  if(root_node)
-    delete root_node;
-  root_node = nullptr;
+  if(GetRoot())
+    delete m_root_node;
+  m_root_node = nullptr;
 }
 
 bool QuadTree::AddPoint(Vertex* p)
 {
-  int r_depth = root_node->AddPoint(p);
+  int r_depth = m_root_node->AddPoint(p);
   if(r_depth == -1)
     return false;
-  depth = r_depth;
+  m_depth = r_depth;
   ++m_num_points;
   return true;
 }
 
 std::vector<Vertex*> QuadTree::GetPointsInRange(BBox *range)
 {
-  return root_node->GetPointsInRange(range);
+  return m_root_node->GetPointsInRange(range);
 }
 
 void QuadTree::draw()
 {
-  root_node->draw();
+  m_root_node->draw();
 }
 
-void QuadTree::delEmptyLeaves()
+std::vector<QuadTreeNode*> QuadTree::GetLeaves(int level)
 {
-  root_node->delEmptyLeaves();
+  if(level <= -1)
+    return get_all_leaves();
+  return get_leaves(level);
+
+  vector<QuadTreeNode*> leaves;
+  queue<QuadTreeNode*> bfs;
+  bfs.push(GetRoot());
+
+  do {
+    QuadTreeNode* curr_node = bfs.front();
+    bfs.pop();
+
+    if(curr_node->IsLeaf()) {
+      leaves.push_back(curr_node);
+      continue;
+    }
+
+    for(size_t i = 0; i < 4; ++i)
+      bfs.push(curr_node->GetChild(i));
+
+  } while(!bfs.empty());
+
+  return leaves;
 }
 
-std::vector<QuadTreeNode*> QuadTree::GetLeaves()
+std::vector<QuadTreeNode*> QuadTree::get_all_leaves()
 {
   vector<QuadTreeNode*> leaves;
   queue<QuadTreeNode*> bfs;
@@ -70,6 +93,31 @@ std::vector<QuadTreeNode*> QuadTree::GetLeaves()
   return leaves;
 }
 
+std::vector<QuadTreeNode*> QuadTree::get_leaves(int level)
+{
+  vector<QuadTreeNode*> leaves;
+  queue<QuadTreeNode*> bfs;
+  bfs.push(GetRoot());
+
+  int curr_level = 0;
+  do {
+    QuadTreeNode* curr_node = bfs.front();
+    bfs.pop();
+    curr_level = curr_node->GetDepth();
+
+    if(curr_node->IsLeaf()) {
+      if(curr_level == level)
+        leaves.push_back(curr_node);
+      continue;
+    }
+
+    for(size_t i = 0; i < 4; ++i)
+      bfs.push(curr_node->GetChild(i));
+
+  } while(!bfs.empty() && curr_level <= level);
+
+  return leaves;
+}
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
@@ -352,6 +400,7 @@ bool pnpoly(glm::vec2 point, std::vector<glm::vec2> hull_vertices)
   return c;
 }
 
+//TODO: Remove this method
 queue<QuadTreeNode*> queue_out_leaves(vector<QuadTreeNode*> leaves,
                                       vector<vec2> hull_vertices)
 {
@@ -381,6 +430,7 @@ queue<QuadTreeNode*> queue_out_leaves(vector<QuadTreeNode*> leaves,
   return to_del;
 }
 
+//TODO: Remove this method
 void delete_out_nodes(QuadTree* qt, vector<Vertex*> hull_vertices)
 {
   assert(qt != nullptr && !hull_vertices.empty());

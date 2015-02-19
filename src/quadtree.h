@@ -10,7 +10,11 @@
 class QuadTree
 {
 public:
-  QuadTree(BBox *bbox, size_t num_points_node = 64);
+  QuadTree(BBox *bbox,
+    size_t num_points_node = 64,
+    int max_depth = -1,
+    std::vector<Vertex*> p = std::vector<Vertex*>());
+
   virtual ~QuadTree();
 
   virtual bool AddPoint(Vertex* p);
@@ -18,7 +22,7 @@ public:
 
   size_t GetMaxPointsNode()
   {
-    return max_points_node;
+    return m_max_points_node;
   }
 
   size_t GetNumPoints()
@@ -28,23 +32,27 @@ public:
 
   int GetDepth()
   {
-    return depth;
+    return m_depth;
   }
 
   QuadTreeNode* GetRoot()
   {
-    return root_node;
+    return m_root_node;
   }
 
-  std::vector<QuadTreeNode*> GetLeaves();
+  std::vector<QuadTreeNode*> GetLeaves(int level = -1);
   void draw();
   void delEmptyLeaves(); //tmp method
 
 private:
-  size_t max_points_node;
+  size_t m_max_points_node;
   size_t m_num_points;
-  int depth;
-  QuadTreeNode* root_node;
+  int m_max_depth;
+  int m_depth;
+  QuadTreeNode* m_root_node;
+
+  std::vector<QuadTreeNode*> get_all_leaves();
+  std::vector<QuadTreeNode*> get_leaves(int level);
 };
 
 bool pnpoly(glm::vec2, std::vector<glm::vec2>);
