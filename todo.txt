@@ -1,0 +1,7 @@
+-Condição de parada por profundidade;
+-Dado um vértice, buscar os nós que contenham ele;
+-Buscar a lista de nós não conformes em um nível;
+
+-Depois:
+--Criar uma malha com os vértices + arestas;
+---Malha deve ser independente da árvore.
