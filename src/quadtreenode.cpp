@@ -97,12 +97,31 @@ int QuadTreeNode::AddPoint(Vertex* p)
     return -1;
 
   if(IsLeaf()) {
-    if(m_points.size() < m_max_points) {
-      m_points.push_back(p);
-      return GetDepth();
+
+    //If there is a depth bound to be respected, we test if the node's depth is
+    //at such bound or if the number of points is bellow the threshold. If any
+    //of these conditions hold, we add the point, if not, we split the node.
+    if(GetMaxDepth() != -1) {
+      if(GetDepth() == GetMaxDepth() || GetNumPoints() < GetMaxPoints()) {
+        m_points.push_back(p);
+        return GetDepth();
+      } else if(GetDepth() < GetMaxDepth()) {
+        Split();
+      }
     } else {
-      Split();
+      if(GetNumPoints() < GetMaxPoints()) {
+        m_points.push_back(p);
+        return GetDepth();
+      } else {
+        Split();
+      }
     }
+
+
+
+
+
+    
   }
 
   int res_depth = GetDepth();

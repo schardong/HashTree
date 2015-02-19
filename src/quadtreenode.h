@@ -52,6 +52,11 @@ public:
     return m_points.size();
   }
 
+  size_t GetMaxPoints()
+  {
+    return m_max_points;
+  }
+
   int GetMaxDepth()
   {
     return m_max_depth;

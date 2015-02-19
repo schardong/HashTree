@@ -78,7 +78,7 @@ void createTree()
       }
   }
 
-  qt = new QuadTree(r0, 32);//, -1, points);
+  qt = new QuadTree(r0, 32, 3);//, -1, points);
   for(size_t i = 0; i < points.size(); ++i) {
     qt->AddPoint(points[i]);
   }
