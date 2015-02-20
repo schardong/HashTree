@@ -51,25 +51,25 @@ std::vector<QuadTreeNode*> QuadTree::GetLeaves(int level)
     return get_all_leaves();
   return get_leaves(level);
 
-  vector<QuadTreeNode*> leaves;
-  queue<QuadTreeNode*> bfs;
-  bfs.push(GetRoot());
+//  vector<QuadTreeNode*> leaves;
+//  queue<QuadTreeNode*> bfs;
+//  bfs.push(GetRoot());
 
-  do {
-    QuadTreeNode* curr_node = bfs.front();
-    bfs.pop();
+//  do {
+//    QuadTreeNode* curr_node = bfs.front();
+//    bfs.pop();
 
-    if(curr_node->IsLeaf()) {
-      leaves.push_back(curr_node);
-      continue;
-    }
+//    if(curr_node->IsLeaf()) {
+//      leaves.push_back(curr_node);
+//      continue;
+//    }
 
-    for(size_t i = 0; i < 4; ++i)
-      bfs.push(curr_node->GetChild(i));
+//    for(size_t i = 0; i < 4; ++i)
+//      bfs.push(curr_node->GetChild(i));
 
-  } while(!bfs.empty());
+//  } while(!bfs.empty());
 
-  return leaves;
+//  return leaves;
 }
 
 std::vector<QuadTreeNode*> QuadTree::GetUnconformingLeaves(int level)
@@ -83,11 +83,11 @@ std::vector<QuadTreeNode*> QuadTree::GetUnconformingLeaves(int level)
 
   size_t l_sz = lvl_leaves.size();
   for(size_t i = 0; i < l_sz; ++i) {
-    for(int j = 0; i < 4; ++j) {
+    for(int j = 0; j < 4; ++j) {
       QuadTreeNode* nbr = lvl_leaves[i]->FindNeighbor((NBR_DIR)j);
       if(nbr == nullptr)
         continue;
-      if(!nbr->IsLeaf() || nbr->GetDepth() != GetDepth()) {
+      if(!nbr->IsLeaf() || nbr->GetDepth() != lvl_leaves[i]->GetDepth()) {
         un_leaves.push_back(lvl_leaves[i]);
         break;
       }

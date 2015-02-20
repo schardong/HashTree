@@ -31,25 +31,16 @@ int g_vertex_id = 0;
 #define TOP 1.f
 #define BOTTOM 0.0001f
 
-GLuint tex_id;
-
 void createTree()
 {
   array<vec2, 4> v0 = {vec2(LEFT, BOTTOM), vec2(RIGHT, BOTTOM), vec2(RIGHT, TOP), vec2(LEFT, TOP)};
   BBox* r0 = new BBox(v0);
-  
-  Mat I;
-  I = imread("faille4.bmp", CV_LOAD_IMAGE_GRAYSCALE);
+
+  Mat I = imread("faille4.bmp", CV_LOAD_IMAGE_GRAYSCALE);
   if(!I.data) {
     cerr << "No image loaded.\n";
   }
 
-  //glGenTextures(1, &tex_id);
-  //glBindTexture(GL_TEXTURE_2D, tex_id);
-  //glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR); // Linear Filtering
-  //glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR); // Linear Filtering
-  //glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, I.cols, I.rows, 0, GL_R, GL_UNSIGNED_BYTE, I.data);
-  
   CV_Assert(I.depth() != sizeof(uchar));
 
   int channels = I.channels();
@@ -60,29 +51,23 @@ void createTree()
   int i,j;
   uchar* p;
   for(i = 0; i < nRows; ++i) {
-      p = I.ptr<uchar>(i);
-      for ( j = 0; j < nCols; ++j) {
-        if(p[j] == 0) {
-          float x = j / (float)nRows + BOTTOM;
-          float y = i / (float)nCols + LEFT;
-          Vertex* v = new Vertex(vec2(x, y));
-          if(r0->PointInBox(vec2(x, y)))
-            points.push_back(v);
-          else
-            delete v;
-        }
+    p = I.ptr<uchar>(i);
+    for ( j = 0; j < nCols; ++j) {
+      if(p[j] == 0) {
+        float x = j / (float)nRows + BOTTOM;
+        float y = i / (float)nCols + LEFT;
+        Vertex* v = new Vertex(vec2(x, y));
+        if(r0->PointInBox(vec2(x, y)))
+          points.push_back(v);
+        else
+          delete v;
       }
+    }
   }
 
   qt = new QuadTree(r0, 32, 4);//, -1, points);
-  for(size_t i = 0; i < points.size(); ++i) {
+  for(size_t i = 0; i < points.size(); ++i)
     qt->AddPoint(points[i]);
-  }
-
-  printf("%d %d %d %d\n", qt->GetLeaves(0).size(), qt->GetLeaves(1).size(), qt->GetLeaves(2).size(), qt->GetLeaves(3).size());
-
-  balance_tree(qt);
-  printf("unconforming leaves of level 2: %d\n", qt->GetUnconformingLeaves(2).size());
 }
 
 void initGL()
@@ -92,7 +77,6 @@ void initGL()
   
   glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
   glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-  //glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
   glMatrixMode(GL_MODELVIEW);
   
   glLoadIdentity();
@@ -102,25 +86,6 @@ void initGL()
 void display()
 {
   glClear(GL_COLOR_BUFFER_BIT);
-
-  /*glBindTexture(GL_TEXTURE_2D, tex_id);
-
-  glColor3f(1, 0, 1);
-  glBegin(GL_QUADS);
-
-  glTexCoord2f(0.f, 0.f);
-  glVertex2f(0.f, 0.f);
-
-  glTexCoord2f(0.f, 1.f);
-  glVertex2f(0.f, 1.f);
-
-  glTexCoord2f(1.f, 1.f);
-  glVertex2f(1.f, 1.f);
-
-  glTexCoord2f(1.f, 0.f);
-  glVertex2f(1.f, 0.f);
-
-  glEnd();*/
 
   glColor3f(0, 1, 0);
   glBegin(GL_POINTS);
@@ -215,44 +180,10 @@ void key_press(unsigned char c, int, int)
 void key_press_special(int c, int, int)
 {
   printf("%d %c\n", c, c);
-  size_t sz = points.size();
 
   switch(c) {
   case GLUT_KEY_F1:
     balance_tree(qt);
-    break;
-  case GLUT_KEY_F2:
-    /*for(size_t i = 0; i < sz; ++i)
-      points[i]->edges.clear();
-
-    for(size_t i = 0; i < edges.size(); ++i) {
-      memset(edges[i], 0, sizeof(Edge));
-      delete edges[i];
-      edges[i] = nullptr;
-    }
-    edges.clear();
-
-    for(size_t i = 1; i <= sz; ++i) {
-      size_t idx1 = (i-1) % sz;
-      size_t idx2 = i % sz;
-      Edge* e1 = new Edge(points[idx1], points[idx2]);
-      points[idx1]->edges.push_back(e1);
-      edges.push_back(e1);
-    }
-
-    for(size_t i = 1; i <= sz; ++i) {
-      size_t idx1 = (i-1) % sz;
-      size_t idx2 = i % sz;
-      Edge* e1 = new Edge(points[idx2], points[idx1]);
-      points[idx2]->edges.push_back(e1);
-      edges.push_back(e1);
-    }
-
-    enforce_corners(qt);*/
-    break;
-  case GLUT_KEY_F3:
-    //find and delete empty nodes.
-    //delete_out_nodes(qt, points);
     break;
   }
 
@@ -264,7 +195,7 @@ int main(int argc, char** argv)
   glutInit(&argc, argv);
   glutInitWindowSize(WIN_WIDTH, WIN_HEIGHT);
   glutInitWindowPosition(50, 50);
-  win_id = glutCreateWindow("Viewport Transform");
+  win_id = glutCreateWindow("Quadtree demo");
   glutDisplayFunc(display);
   //ADD-THIS-LATER!
   //glutIdleFunc(display);
