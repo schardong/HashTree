@@ -28,7 +28,6 @@ class QuadTreeNode
 {
 public:
   QuadTreeNode();
-
   QuadTreeNode(BBox* box,
                size_t max_npoints = 64,
                int max_depth = -1,
@@ -37,15 +36,16 @@ public:
                glm::vec3 color = glm::vec3(1, 0, 0));
 
   virtual ~QuadTreeNode();
+  virtual void Split();
+  virtual int AddPoint(Vertex* p);
+  virtual std::vector<Vertex*> GetPointsInRange(BBox* range);
+  QuadTreeNode* FindNeighbor(NBR_DIR dir);
+  void draw();
 
   virtual bool IsLeaf()
   {
     return !(m_children[0] || m_children[1] || m_children[2] || m_children[3]);
   }
-
-  virtual void Split();
-  virtual int AddPoint(Vertex* p);
-  virtual std::vector<Vertex*> GetPointsInRange(BBox* range);
 
   size_t GetNumPoints()
   {
@@ -118,9 +118,6 @@ public:
   {
     m_color = c;
   }
-
-  QuadTreeNode* FindNeighbor(NBR_DIR dir);
-  void draw();
 
 private:
   size_t id;
