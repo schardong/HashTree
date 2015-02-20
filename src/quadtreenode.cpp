@@ -97,7 +97,6 @@ int QuadTreeNode::AddPoint(Vertex* p)
     return -1;
 
   if(IsLeaf()) {
-
     //If there is a depth bound to be respected, we test if the node's depth is
     //at such bound or if the number of points is bellow the threshold. If any
     //of these conditions hold, we add the point, if not, we split the node.
@@ -118,6 +117,8 @@ int QuadTreeNode::AddPoint(Vertex* p)
     }    
   }
 
+  //If the node is not a leaf, we try to add the point into one of its children.
+  //The resulting depth is returned.
   int res_depth = GetDepth();
   for(size_t i = 0; i < 4; ++i) {
     if(m_children[i]->GetBBox()->PointInBox(p->p)) {
