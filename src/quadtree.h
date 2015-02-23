@@ -19,6 +19,10 @@ public:
 
   virtual bool AddPoint(Vertex* p);
   virtual std::vector<Vertex*> GetPointsInRange(BBox* range);
+  std::vector<QuadTreeNode*> GetLeaves(int level = -1);
+  std::vector<QuadTreeNode*> GetUnconformingLeaves(int level);
+  std::vector<QuadTreeNode*> GetAllNodes();
+  void draw();
 
   size_t GetMaxPointsNode()
   {
@@ -44,10 +48,6 @@ public:
   {
     return m_root_node;
   }
-
-  std::vector<QuadTreeNode*> GetLeaves(int level = -1);
-  std::vector<QuadTreeNode*> GetUnconformingLeaves(int level);
-  void draw();
 
 private:
   size_t m_max_points_node;

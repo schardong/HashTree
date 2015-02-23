@@ -77,6 +77,30 @@ std::vector<QuadTreeNode*> QuadTree::GetUnconformingLeaves(int level)
   return un_leaves;
 }
 
+std::vector<QuadTreeNode*> QuadTree::GetAllNodes()
+{
+  vector<QuadTreeNode*> nodes;
+
+  queue<QuadTreeNode*> node_q;
+  node_q.push(GetRoot());
+
+  do {
+    QuadTreeNode* curr_node = node_q.front();
+    node_q.pop();
+
+    if(!curr_node)
+      continue;
+
+    nodes.push_back(curr_node);
+    if(!curr_node->IsLeaf())
+      for(int i = 0; i < 4; ++i)
+        node_q.push(curr_node->GetChild(i));
+
+  } while(!node_q.empty());
+  
+  return nodes;
+}
+
 std::vector<QuadTreeNode*> QuadTree::get_all_leaves()
 {
   vector<QuadTreeNode*> leaves;
