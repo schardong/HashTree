@@ -3,18 +3,22 @@
 #include <array>
 #include <vector>
 #include <map>
+#include <cstdlib>
+#include <cstring>
+#include <fstream>
+#include <GL/glut.h>
 
 #include "quadtree.h"
 #include "edge.h"
 #include "mesh.h"
-
-#include <GL/glut.h>
+#include "opencv2/opencv.hpp"
 
 using namespace std;
 using namespace glm;
+using namespace cv;
 
-static int WIN_WIDTH = 800;
-static int WIN_HEIGHT = 800;
+static int WIN_WIDTH = 512;
+static int WIN_HEIGHT = 512;
 static int win_id = -1;
 
 QuadTree* qt = nullptr;
@@ -24,23 +28,61 @@ vector<Vertex*> points;
 vector<Edge*> edges;
 int g_vertex_id = 0;
 
-#define LEFT 0.f
+#define LEFT 0.0001f
 #define RIGHT 1.f
 #define TOP 1.f
-#define BOTTOM 0.f
+#define BOTTOM 0.0001f
+
+void createTree()
+{
+  array<vec2, 4> v0 = {vec2(LEFT, BOTTOM), vec2(RIGHT, BOTTOM), vec2(RIGHT, TOP), vec2(LEFT, TOP)};
+  BBox* r0 = new BBox(v0);
+
+  Mat I = imread("faille4.bmp", CV_LOAD_IMAGE_GRAYSCALE);
+  if(!I.data) {
+    cerr << "No image loaded.\n";
+  }
+
+  CV_Assert(I.depth() != sizeof(uchar));
+
+  int channels = I.channels();
+
+  int nRows = I.rows;
+  int nCols = I.cols * channels;
+
+  int i,j;
+  uchar* p;
+  for(i = 0; i < nRows; ++i) {
+    p = I.ptr<uchar>(i);
+    for ( j = 0; j < nCols; ++j) {
+      if(p[j] == 0) {
+        float x = j / (float)nRows + BOTTOM;
+        float y = i / (float)nCols + LEFT;
+        Vertex* v = new Vertex(vec2(x, y));
+        if(r0->PointInBox(vec2(x, y)))
+          points.push_back(v);
+        else
+          delete v;
+      }
+    }
+  }
+
+  qt = new QuadTree(r0, 32, 4);//, -1, points);
+  for(size_t i = 0; i < points.size(); ++i)
+    qt->AddPoint(points[i]);
+}
 
 void initGL()
 {
-  array<vec2, 4> v0 = {vec2(0, 0.1), vec2(0.8, 0.1), vec2(1, 0.9), vec2(0.2, 0.9)};
+  createTree();
+  glEnable(GL_TEXTURE_2D);
   
-  BBox* r0 = new BBox(v0);
-  qt = new QuadTree(r0, 1);
-
   glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
   glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
   glMatrixMode(GL_MODELVIEW);
+  
   glLoadIdentity();
-  glPointSize(3);
+  glPointSize(1);
 }
 
 void display()
@@ -83,8 +125,8 @@ void reshape(GLsizei width, GLsizei height)
 
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
-
   gluOrtho2D(LEFT, RIGHT, BOTTOM, TOP);
+
   glutPostRedisplay();
 }
 
@@ -143,46 +185,10 @@ void key_press(unsigned char c, int, int)
 void key_press_special(int c, int, int)
 {
   printf("%d %c\n", c, c);
-  size_t sz = points.size();
 
   switch(c) {
   case GLUT_KEY_F1:
     balance_tree(qt);
-    break;
-  case GLUT_KEY_F2:
-    for(size_t i = 0; i < sz; ++i)
-      points[i]->edges.clear();
-
-    for(size_t i = 0; i < edges.size(); ++i) {
-      memset(edges[i], 0, sizeof(Edge));
-      delete edges[i];
-      edges[i] = nullptr;
-    }
-    edges.clear();
-
-    for(size_t i = 1; i <= sz; ++i) {
-      size_t idx1 = (i-1) % sz;
-      size_t idx2 = i % sz;
-      Edge* e1 = new Edge(points[idx1], points[idx2]);
-      points[idx1]->edges.push_back(e1);
-      edges.push_back(e1);
-    }
-
-    for(size_t i = 1; i <= sz; ++i) {
-      size_t idx1 = (i-1) % sz;
-      size_t idx2 = i % sz;
-      Edge* e1 = new Edge(points[idx2], points[idx1]);
-      points[idx2]->edges.push_back(e1);
-      edges.push_back(e1);
-    }
-
-    enforce_corners(qt);
-    break;
-  case GLUT_KEY_F3:
-    //find and delete empty nodes.
-    g_mesh = new Mesh(qt);
-    g_mesh->SetBaseMesh(points);
-    //delete_out_nodes(qt, points);
     break;
   }
 
@@ -194,7 +200,7 @@ int main(int argc, char** argv)
   glutInit(&argc, argv);
   glutInitWindowSize(WIN_WIDTH, WIN_HEIGHT);
   glutInitWindowPosition(50, 50);
-  win_id = glutCreateWindow("Viewport Transform");
+  win_id = glutCreateWindow("Quadtree demo");
   glutDisplayFunc(display);
   //ADD-THIS-LATER!
   //glutIdleFunc(display);

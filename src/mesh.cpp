@@ -1,7 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <set>
-#include <gl/glut.h>
+#include <GL/glut.h>
 #include "mesh.h"
 #include "quadtree.h"
 #include "quadtreenode.h"
@@ -87,10 +87,6 @@ void Mesh::Triangulate()
 
 void Mesh::draw()
 {
-  /*size_t f_sz = m_faces.size();
-  for(size_t i = 0; i < f_sz; ++i) 
-    m_faces[i]->draw();*/
-
   glColor3f(0, 1, 1);
   size_t v_sz = m_vertices.size();
   for(size_t i = 0; i < v_sz; ++i) {

@@ -9,37 +9,41 @@ static size_t g_quad_node_id = 0;
 
 QuadTreeNode::QuadTreeNode()
 {
-  max_points = 64;
+  m_max_points = 64;
+  m_max_depth = -1;
+  m_depth = 0;
+  m_node_type = ROOT;
 }
 
 QuadTreeNode::QuadTreeNode(BBox* box,
                            size_t max_npoints,
+                           int max_depth,
                            NODE_TYPE nt,
-                           glm::vec3 color,
-                           std::vector<Vertex*> p) :
-  bbox(box), node_type(nt), points(p), max_points(max_npoints)
+                           std::vector<Vertex*> p,
+                           glm::vec3 color) :
+  m_box(box), m_max_depth(max_depth), m_node_type(nt), m_points(p), m_max_points(max_npoints)
 {
   id = g_quad_node_id++;
-  depth = 0;
+  m_depth = 0;
   m_color = color;
-  parent = nullptr;
-  memset(children, 0, sizeof(QuadTreeNode*) * 4);
+  m_parent = nullptr;
+  memset(m_children, 0, sizeof(QuadTreeNode*) * 4);
 }
 
 QuadTreeNode::~QuadTreeNode()
 {
   if(!IsLeaf()) {
     for(int i = 0; i < 4; i++) {
-      delete children[i];
-      children[i] = nullptr;
+      delete m_children[i];
+      m_children[i] = nullptr;
     }
   }
   else
-    points.clear();
+    m_points.clear();
 
-  delete bbox;
-  bbox = nullptr;
-  parent = nullptr;
+  delete m_box;
+  m_box = nullptr;
+  m_parent = nullptr;
 }
 
 void QuadTreeNode::Split()
@@ -52,7 +56,7 @@ void QuadTreeNode::Split()
 
   vector<Vertex*> p_quads[4];
   array<BBox*, 4> bbox_quads;
-  BBox* box = (BBox*) bbox;
+  BBox* box = (BBox*) m_box;
 
   vec2 e0_midp = 0.5f * (box->GetCorner(1) - box->GetCorner(0)) + box->GetCorner(0);
   vec2 e1_midp = 0.5f * (box->GetCorner(2) - box->GetCorner(1)) + box->GetCorner(1);
@@ -70,7 +74,7 @@ void QuadTreeNode::Split()
   bbox_quads[NW] = new BBox(v2);
   bbox_quads[NE] = new BBox(v3);
 
-  for(auto it = points.begin(); it != points.end(); ++it) {
+  for(auto it = m_points.begin(); it != m_points.end(); ++it) {
     for(size_t i = 0; i < 4; ++i) {
       if(bbox_quads[i]->PointInBox((*it)->p)) {
         p_quads[i].push_back(*it);
@@ -80,31 +84,45 @@ void QuadTreeNode::Split()
   }
 
   for(int i = 0; i < 4; ++i) {
-    children[i] = new QuadTreeNode(bbox_quads[i], max_points, (NODE_TYPE)i, m_color, p_quads[i]);
-    children[i]->SetDepth(GetDepth() + 1);
-    children[i]->SetParent(this);
+    m_children[i] = new QuadTreeNode(bbox_quads[i], m_max_points, m_max_depth, (NODE_TYPE)i, p_quads[i], m_color);
+    m_children[i]->SetDepth(GetDepth() + 1);
+    m_children[i]->SetParent(this);
   }
-  points.clear();
+  m_points.clear();
 }
 
 int QuadTreeNode::AddPoint(Vertex* p)
 {
-  if(!bbox->PointInBox(p->p))
+  if(!m_box->PointInBox(p->p))
     return -1;
 
   if(IsLeaf()) {
-    if(points.size() < max_points) {
-      points.push_back(p);
-      return GetDepth();
+    //If there is a depth bound to be respected, we test if the node's depth is
+    //at such bound or if the number of points is bellow the threshold. If any
+    //of these conditions hold, we add the point, if not, we split the node.
+    if(GetMaxDepth() != -1) {
+      if(GetDepth() == GetMaxDepth() || GetNumPoints() < GetMaxPoints()) {
+        m_points.push_back(p);
+        return GetDepth();
+      } else if(GetDepth() < GetMaxDepth()) {
+        Split();
+      }
     } else {
-      Split();
-    }
+      if(GetNumPoints() < GetMaxPoints()) {
+        m_points.push_back(p);
+        return GetDepth();
+      } else {
+        Split();
+      }
+    }    
   }
 
+  //If the node is not a leaf, we try to add the point into one of its children.
+  //The resulting depth is returned.
   int res_depth = GetDepth();
   for(size_t i = 0; i < 4; ++i) {
-    if(children[i]->GetBBox()->PointInBox(p->p)) {
-      int d = children[i]->AddPoint(p);
+    if(m_children[i]->GetBBox()->PointInBox(p->p)) {
+      int d = m_children[i]->AddPoint(p);
       res_depth = d > res_depth? d : res_depth;
     }
   }
@@ -123,14 +141,14 @@ std::vector<Vertex*> QuadTreeNode::GetPointsInRange(BBox* range)
     return p_range;
 
   if(IsLeaf()) {
-    for(auto it = points.begin(); it != points.end(); it++)
+    for(auto it = m_points.begin(); it != m_points.end(); it++)
       if(range->PointInBox((*it)->p))
         p_range.push_back(*it);
     return p_range;
   }
 
   for(size_t i = 0; i < 4; ++i) {
-    vector<Vertex*> tmp = children[i]->GetPointsInRange(range);
+    vector<Vertex*> tmp = m_children[i]->GetPointsInRange(range);
     if(!tmp.empty())
       p_range.insert(p_range.end(), tmp.begin(), tmp.end());
   }
@@ -141,35 +159,19 @@ std::vector<Vertex*> QuadTreeNode::GetPointsInRange(BBox* range)
 void QuadTreeNode::draw()
 {
   glColor3f(m_color.r, m_color.g, m_color.b);
-  bbox->draw();
+  m_box->draw();
 
   if(!IsLeaf())
     for(int i = 0; i < 4; ++i)
-      if(children[i])
-        children[i]->draw();
-}
-
-void QuadTreeNode::delEmptyLeaves()
-{
-  if(IsLeaf())
-    return;
-  for(int i = 0; i < 4; ++i) {
-    if(children[i]->IsLeaf()) {
-      if(children[i]->GetNumPoints() == 0) {
-        delete children[i];
-        children[i] = nullptr;
-      }
-    } else {
-      children[i]->delEmptyLeaves();
-    }
-  }
+      if(m_children[i])
+        m_children[i]->draw();
 }
 
 QuadTreeNode* QuadTreeNode::FindNeighbor(NBR_DIR dir)
 {
   using namespace std;
 
-  if(!IsLeaf() || node_type == ROOT)
+  if(!IsLeaf() || m_node_type == ROOT)
     return nullptr;
 
   switch(dir) {
