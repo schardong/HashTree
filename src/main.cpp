@@ -11,11 +11,11 @@
 #include "quadtree.h"
 #include "edge.h"
 #include "mesh.h"
-#include "opencv2/opencv.hpp"
+#include "CImg.h"
 
 using namespace std;
 using namespace glm;
-using namespace cv;
+using namespace cimg_library;
 
 static int WIN_WIDTH = 512;
 static int WIN_HEIGHT = 512;
@@ -27,48 +27,39 @@ Mesh* g_mesh = nullptr;
 vector<Vertex*> points;
 vector<Edge*> edges;
 
-#define LEFT 0.001f
+#define LEFT 0.0001f
 #define RIGHT 1.f
 #define TOP 1.f
-#define BOTTOM 0.001f
+#define BOTTOM 0.0001f
 
 void createTree()
 {
-  array<vec2, 4> v0 = {vec2(LEFT, BOTTOM), vec2(RIGHT, BOTTOM), vec2(RIGHT, TOP), vec2(LEFT, TOP)};
-  BBox* r0 = new BBox(v0);
+	array<vec2, 4> v0 = { vec2(LEFT, BOTTOM), vec2(RIGHT, BOTTOM), vec2(RIGHT, TOP), vec2(LEFT, TOP) };
+	BBox* r0 = new BBox(v0);
 
-  Mat I = imread("faille4.bmp", CV_LOAD_IMAGE_GRAYSCALE);
-  if(!I.data) {
-    cerr << "No image loaded.\n";
-  }
+	//AXELLE
+	CImg<unsigned char> image;
+	image.load_bmp("faille4.bmp");
+	int w = image.width();
+	int h = image.height();
+	for (int i = 0; i < w; i++){
+		for (int j = 0; j < h; j++){
+			if (image(i, j) == 0){ //black points
+				float normi = (float)i / w;
+				float normj = (float)j / h;
+				Vertex* v = new Vertex(vec2(normi, normj));
+				if (r0->PointInBox(vec2(normi, normj)))
+					points.push_back(v);
+				else
+					delete v;
+			}
+		}
+	}
 
-  CV_Assert(I.depth() != sizeof(uchar));
-
-  int channels = I.channels();
-
-  int nRows = I.rows;
-  int nCols = I.cols * channels;
-
-  int i,j;
-  uchar* p;
-  for(i = 0; i < nRows; ++i) {
-    p = I.ptr<uchar>(i);
-    for ( j = 0; j < nCols; ++j) {
-      if(p[j] == 0) {
-        float x = j / (float)nRows + BOTTOM;
-        float y = i / (float)nCols + LEFT;
-        Vertex* v = new Vertex(vec2(x, y));
-        if(r0->PointInBox(vec2(x, y)))
-          points.push_back(v);
-        else
-          delete v;
-      }
-    }
-  }
-
-  qt = new QuadTree(r0, 32, 4);//, -1, points);
+  qt = new QuadTree(r0, 10, 4);//, -1, points);
   for(size_t i = 0; i < points.size(); ++i)
     qt->AddPoint(points[i]);
+
 }
 
 void initGL()
@@ -78,6 +69,7 @@ void initGL()
   
   glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
   glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
   glMatrixMode(GL_MODELVIEW);
   
   glLoadIdentity();
@@ -104,10 +96,11 @@ void display()
   glEnd();
 
   glColor3f(1, 0, 0);
-  if(g_mesh == nullptr)
-    qt->draw();
+  if (g_mesh == nullptr){
+	  qt->draw();
+  }
   else
-    g_mesh->draw();
+	  g_mesh->draw();
 
   glutSwapBuffers();
 }
@@ -124,7 +117,8 @@ void reshape(GLsizei width, GLsizei height)
 
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
-  gluOrtho2D(0.f, RIGHT, 0.f, TOP);
+  //gluOrtho2D(LEFT, RIGHT, BOTTOM, TOP);
+  gluOrtho2D(0.f, RIGHT, TOP, BOTTOM);
 
   glutPostRedisplay();
 }
@@ -136,7 +130,7 @@ void mouse_click(int button, int state, int x, int y)
     {
     case GLUT_LEFT_BUTTON:
     default:
-      Vertex* v = new Vertex(vec2(x / (float)WIN_WIDTH, (WIN_HEIGHT - y) / (float)WIN_HEIGHT));
+      Vertex* v = new Vertex(vec2(x / (float)WIN_WIDTH, y / (float)WIN_HEIGHT));
       if(qt->AddPoint(v))
         points.push_back(v);
       break;
@@ -196,12 +190,13 @@ void key_press_special(int c, int, int)
 int main(int argc, char** argv)
 {
   glutInit(&argc, argv);
+  glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE);
   glutInitWindowSize(WIN_WIDTH, WIN_HEIGHT);
   glutInitWindowPosition(50, 50);
   win_id = glutCreateWindow("Quadtree demo");
+  
   glutDisplayFunc(display);
-  //ADD-THIS-LATER!
-  //glutIdleFunc(display);
+  glutIdleFunc(display);
   glutReshapeFunc(reshape);
   glutMouseFunc(mouse_click);
   glutKeyboardFunc(key_press);
