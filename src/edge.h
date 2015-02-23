@@ -6,6 +6,8 @@
 
 class Edge;
 
+static int g_vertex_id = 0;
+
 class Vertex
 {
 public:
@@ -15,7 +17,9 @@ public:
 
   Vertex(glm::vec2 p1 = glm::vec2(0)) :
     p(p1)
-  {}
+  {
+    id = g_vertex_id++;
+  }
 };
 
 class Edge

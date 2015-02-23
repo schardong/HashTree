@@ -26,12 +26,11 @@ Mesh* g_mesh = nullptr;
 
 vector<Vertex*> points;
 vector<Edge*> edges;
-int g_vertex_id = 0;
 
-#define LEFT 0.0001f
+#define LEFT 0.001f
 #define RIGHT 1.f
 #define TOP 1.f
-#define BOTTOM 0.0001f
+#define BOTTOM 0.001f
 
 void createTree()
 {
@@ -125,7 +124,7 @@ void reshape(GLsizei width, GLsizei height)
 
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
-  gluOrtho2D(LEFT, RIGHT, BOTTOM, TOP);
+  gluOrtho2D(0.f, RIGHT, 0.f, TOP);
 
   glutPostRedisplay();
 }
@@ -138,7 +137,6 @@ void mouse_click(int button, int state, int x, int y)
     case GLUT_LEFT_BUTTON:
     default:
       Vertex* v = new Vertex(vec2(x / (float)WIN_WIDTH, (WIN_HEIGHT - y) / (float)WIN_HEIGHT));
-      v->id = g_vertex_id++;
       if(qt->AddPoint(v))
         points.push_back(v);
       break;
