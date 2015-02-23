@@ -183,7 +183,7 @@ void key_press_special(int c, int, int)
     break;
   case GLUT_KEY_F2:
     QuadTreeNode* node = qt->GetRoot()->GetChild(NE);
-    vector<QuadTreeNode*> test = get_nbrs_vertex(node, qt->GetAllNodes(), 3);
+    vector<QuadTreeNode*> test = get_nbrs_vertex(node, qt->GetAllNodes(), 0);
     for(size_t i = 0; i < test.size(); ++i) {
       test[i]->SetColor(glm::vec3(0, 0, 1));
     }
