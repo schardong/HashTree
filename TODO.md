@@ -1,5 +1,5 @@
 -Condição de parada por profundidade; (DONE)
--Dado um vértice, buscar os nós que contenham ele;
+-Dado um nó e um vértice, buscar os nós que tenham o vértice em comum;
 -Buscar a lista de nós não conformes em um nível; (DONE)
 --Nós não conformes são aqueles que possuem algum vizinho que não esteja na mesma profundidade;
 

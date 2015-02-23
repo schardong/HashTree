@@ -50,26 +50,6 @@ std::vector<QuadTreeNode*> QuadTree::GetLeaves(int level)
   if(level <= -1)
     return get_all_leaves();
   return get_leaves(level);
-
-//  vector<QuadTreeNode*> leaves;
-//  queue<QuadTreeNode*> bfs;
-//  bfs.push(GetRoot());
-
-//  do {
-//    QuadTreeNode* curr_node = bfs.front();
-//    bfs.pop();
-
-//    if(curr_node->IsLeaf()) {
-//      leaves.push_back(curr_node);
-//      continue;
-//    }
-
-//    for(size_t i = 0; i < 4; ++i)
-//      bfs.push(curr_node->GetChild(i));
-
-//  } while(!bfs.empty());
-
-//  return leaves;
 }
 
 std::vector<QuadTreeNode*> QuadTree::GetUnconformingLeaves(int level)
@@ -183,14 +163,14 @@ bool leaf_numpoints_comp(QuadTreeNode* a, QuadTreeNode* b)
   return a->GetNumPoints() > b->GetNumPoints();
 }
 
-std::vector<QuadTreeNode*> get_populated_leaves(QuadTree* qt)
+std::vector<QuadTreeNode*> get_populated_leaves(QuadTree* qt, int level)
 {
   vector<QuadTreeNode*> leaves;
 
   if(qt == nullptr)
     return leaves;
 
-  leaves = qt->GetLeaves();
+  leaves = qt->GetLeaves(level);
 
   //Sorting the leaves by the number of points in them.
   sort(leaves.begin(), leaves.end(), leaf_numpoints_comp);
@@ -204,6 +184,20 @@ std::vector<QuadTreeNode*> get_populated_leaves(QuadTree* qt)
   //Removing the empty leaves from the set.
   leaves.erase(it, leaves.end());
   return leaves;
+}
+
+bool pnpoly(glm::vec2 point, std::vector<glm::vec2> hull_vertices)
+{
+  int i, j, nvert = hull_vertices.size();
+  bool c = false;
+
+  for(i = 0, j = nvert - 1; i < nvert; j = i++)
+    if(((hull_vertices[i].y >= point.y) != (hull_vertices[j].y >= point.y)) &&
+        (point.x <= (hull_vertices[j].x - hull_vertices[i].x) * (point.y - hull_vertices[i].y) / (hull_vertices[j].y - hull_vertices[i].y) + hull_vertices[i].x)
+      )
+      c = !c;
+
+  return c;
 }
 
 std::vector<QuadTreeNode*> get_first_nbrs(QuadTreeNode* node,
@@ -227,114 +221,114 @@ std::vector<QuadTreeNode*> get_first_nbrs(QuadTreeNode* node,
   return nbrs;
 }
 
-std::vector<QuadTreeNode*> get_second_neighbors(QuadTreeNode* node,
-                                                std::vector<QuadTreeNode*> leaves)
-{
-  vector<QuadTreeNode*> nbrs;
+//std::vector<QuadTreeNode*> get_second_neighbors(QuadTreeNode* node,
+//                                                std::vector<QuadTreeNode*> leaves)
+//{
+//  vector<QuadTreeNode*> nbrs;
+//
+//  if(node == nullptr || leaves.empty())
+//    return nbrs;
+//
+//  //Getting the node's first neighbors.
+//  vector<QuadTreeNode*> fst_nbrs = get_first_nbrs(node, leaves);
+//  if(fst_nbrs.empty())
+//    return nbrs;
+//
+//  //For each first neighbor, we get it's first neighbors. The second neighbors
+//  //should be in this set as well as the other first neighbors and the node.
+//  set<QuadTreeNode*> tmp_nbrs;
+//  for(size_t i = 0; i < fst_nbrs.size(); ++i) {
+//    vector<QuadTreeNode*> tmp_fst_nbrs = get_first_nbrs(fst_nbrs[i], leaves);
+//    tmp_nbrs.insert(tmp_fst_nbrs.begin(), tmp_fst_nbrs.end());
+//  }
+//
+//  //Erasing the node and its first neighbors.
+//  //All the nodes left in the set are the second neighbors.
+//  tmp_nbrs.erase(node);
+//  for(size_t i = 0; i < fst_nbrs.size(); ++i) 
+//    tmp_nbrs.erase(fst_nbrs[i]);
+//
+//  for(auto it = tmp_nbrs.begin(); it != tmp_nbrs.end(); ++it)
+//    nbrs.push_back(*it);
+//
+//  return nbrs;
+//}
+//
+//std::vector<QuadTreeNode*> get_third_neighbors(QuadTreeNode* node,
+//                                               std::vector<QuadTreeNode*> leaves)
+//{
+//  vector<QuadTreeNode*> nbrs;
+//
+//  if(node == nullptr || leaves.empty())
+//    return nbrs;
+//
+//  vector<QuadTreeNode*> fst_nbrs = get_first_nbrs(node, leaves);
+//  vector<QuadTreeNode*> scnd_nbrs = get_second_neighbors(node, leaves);
+//  if(fst_nbrs.empty() || scnd_nbrs.empty())
+//    return nbrs;
+//
+//  set<QuadTreeNode*> tmp_nbrs;
+//  for(size_t i = 0; i < scnd_nbrs.size(); ++i) {
+//    vector<QuadTreeNode*> tmp_scnd_nbrs = get_first_nbrs(scnd_nbrs[i], leaves);
+//    tmp_nbrs.insert(tmp_scnd_nbrs.begin(), tmp_scnd_nbrs.end());
+//  }
+//
+//  //Erasing the node and its first neighbors.
+//  //All the nodes left in the set are the second and third neighbors.
+//  tmp_nbrs.erase(node);
+//  for(size_t i = 0; i < fst_nbrs.size(); ++i) 
+//    tmp_nbrs.erase(fst_nbrs[i]);
+//
+//  //Erasing the node's second neighbors.
+//  //All the nodes left in the set are the third neighbors.
+//  for(size_t i = 0; i < scnd_nbrs.size(); ++i) 
+//    tmp_nbrs.erase(scnd_nbrs[i]);
+//
+//  for(auto it = tmp_nbrs.begin(); it != tmp_nbrs.end(); ++it)
+//    nbrs.push_back(*it);
+//
+//  return nbrs;
+//}
 
-  if(node == nullptr || leaves.empty())
-    return nbrs;
-
-  //Getting the node's first neighbors.
-  vector<QuadTreeNode*> fst_nbrs = get_first_nbrs(node, leaves);
-  if(fst_nbrs.empty())
-    return nbrs;
-
-  //For each first neighbor, we get it's first neighbors. The second neighbors
-  //should be in this set as well as the other first neighbors and the node.
-  set<QuadTreeNode*> tmp_nbrs;
-  for(size_t i = 0; i < fst_nbrs.size(); ++i) {
-    vector<QuadTreeNode*> tmp_fst_nbrs = get_first_nbrs(fst_nbrs[i], leaves);
-    tmp_nbrs.insert(tmp_fst_nbrs.begin(), tmp_fst_nbrs.end());
-  }
-
-  //Erasing the node and its first neighbors.
-  //All the nodes left in the set are the second neighbors.
-  tmp_nbrs.erase(node);
-  for(size_t i = 0; i < fst_nbrs.size(); ++i) 
-    tmp_nbrs.erase(fst_nbrs[i]);
-
-  for(auto it = tmp_nbrs.begin(); it != tmp_nbrs.end(); ++it)
-    nbrs.push_back(*it);
-
-  return nbrs;
-}
-
-std::vector<QuadTreeNode*> get_third_neighbors(QuadTreeNode* node,
-                                               std::vector<QuadTreeNode*> leaves)
-{
-  vector<QuadTreeNode*> nbrs;
-
-  if(node == nullptr || leaves.empty())
-    return nbrs;
-
-  vector<QuadTreeNode*> fst_nbrs = get_first_nbrs(node, leaves);
-  vector<QuadTreeNode*> scnd_nbrs = get_second_neighbors(node, leaves);
-  if(fst_nbrs.empty() || scnd_nbrs.empty())
-    return nbrs;
-
-  set<QuadTreeNode*> tmp_nbrs;
-  for(size_t i = 0; i < scnd_nbrs.size(); ++i) {
-    vector<QuadTreeNode*> tmp_scnd_nbrs = get_first_nbrs(scnd_nbrs[i], leaves);
-    tmp_nbrs.insert(tmp_scnd_nbrs.begin(), tmp_scnd_nbrs.end());
-  }
-
-  //Erasing the node and its first neighbors.
-  //All the nodes left in the set are the second and third neighbors.
-  tmp_nbrs.erase(node);
-  for(size_t i = 0; i < fst_nbrs.size(); ++i) 
-    tmp_nbrs.erase(fst_nbrs[i]);
-
-  //Erasing the node's second neighbors.
-  //All the nodes left in the set are the third neighbors.
-  for(size_t i = 0; i < scnd_nbrs.size(); ++i) 
-    tmp_nbrs.erase(scnd_nbrs[i]);
-
-  for(auto it = tmp_nbrs.begin(); it != tmp_nbrs.end(); ++it)
-    nbrs.push_back(*it);
-
-  return nbrs;
-}
-
-bool node_depth_comp(QuadTreeNode* a, QuadTreeNode* b)
-{
-  return a->GetDepth() < b->GetDepth();
-}
-
-void split_nodes(std::vector<QuadTreeNode*> nodes)
-{
-  //Sorting the nodes by their depths.
-  sort(nodes.begin(), nodes.end(), node_depth_comp);
-
-  int max_depth = (*(nodes.end() - 1))->GetDepth();
-  vector<QuadTreeNode*>::iterator node_it;
-
-  for(node_it = nodes.begin(); node_it != nodes.end(); ++node_it)
-    if((*node_it)->GetDepth() == max_depth)
-      break;
-
-  //Erasing any nodes with the largest depth so that we may include only the
-  //nodes that need to be split in a processing queue.
-  nodes.erase(node_it, nodes.end());
-
-  queue<QuadTreeNode*> node_q;
-  for(size_t i = 0; i < nodes.size(); ++i)
-    node_q.push(nodes[i]);
-
-  do {
-    QuadTreeNode* curr_node = node_q.front();
-    node_q.pop();
-
-    curr_node->Split();
-    int curr_depth = curr_node->GetDepth();
-
-    //If the depth difference is too big, we must split the children as well.
-    if((max_depth - curr_depth) > 1)
-      for(int i = 0; i < 4; ++i)
-        node_q.push(curr_node->GetChild(i));
-
-  } while(!node_q.empty());
-}
+//bool node_depth_comp(QuadTreeNode* a, QuadTreeNode* b)
+//{
+//  return a->GetDepth() < b->GetDepth();
+//}
+//
+//void split_nodes(std::vector<QuadTreeNode*> nodes)
+//{
+//  //Sorting the nodes by their depths.
+//  sort(nodes.begin(), nodes.end(), node_depth_comp);
+//
+//  int max_depth = (*(nodes.end() - 1))->GetDepth();
+//  vector<QuadTreeNode*>::iterator node_it;
+//
+//  for(node_it = nodes.begin(); node_it != nodes.end(); ++node_it)
+//    if((*node_it)->GetDepth() == max_depth)
+//      break;
+//
+//  //Erasing any nodes with the largest depth so that we may include only the
+//  //nodes that need to be split in a processing queue.
+//  nodes.erase(node_it, nodes.end());
+//
+//  queue<QuadTreeNode*> node_q;
+//  for(size_t i = 0; i < nodes.size(); ++i)
+//    node_q.push(nodes[i]);
+//
+//  do {
+//    QuadTreeNode* curr_node = node_q.front();
+//    node_q.pop();
+//
+//    curr_node->Split();
+//    int curr_depth = curr_node->GetDepth();
+//
+//    //If the depth difference is too big, we must split the children as well.
+//    if((max_depth - curr_depth) > 1)
+//      for(int i = 0; i < 4; ++i)
+//        node_q.push(curr_node->GetChild(i));
+//
+//  } while(!node_q.empty());
+//}
 
 //QuadTreeNode* track_pop_leaf(QuadTreeNode* root)
 //{
@@ -412,20 +406,6 @@ void split_nodes(std::vector<QuadTreeNode*> nodes)
 //
 //  } while(!pop_leaves.empty());
 //}
-
-bool pnpoly(glm::vec2 point, std::vector<glm::vec2> hull_vertices)
-{
-  int i, j, nvert = hull_vertices.size();
-  bool c = false;
-
-  for(i = 0, j = nvert - 1; i < nvert; j = i++)
-    if(((hull_vertices[i].y >= point.y) != (hull_vertices[j].y >= point.y)) &&
-        (point.x <= (hull_vertices[j].x - hull_vertices[i].x) * (point.y - hull_vertices[i].y) / (hull_vertices[j].y - hull_vertices[i].y) + hull_vertices[i].x)
-      )
-      c = !c;
-
-  return c;
-}
 
 //queue<QuadTreeNode*> queue_out_leaves(vector<QuadTreeNode*> leaves,
 //                                      vector<vec2> hull_vertices)
