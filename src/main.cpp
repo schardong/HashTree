@@ -47,8 +47,8 @@ void createTree()
 			if (image(i, j) == 0){ //black points
 				float normi = (float)i / w;
 				float normj = (float)j / h;
-				Vertex* v = new Vertex(vec2(normi, normj));
-				if (r0->PointInBox(vec2(normi, normj)))
+				Vertex* v = new Vertex(vec2(normi, 1-normj));
+				if (r0->PointInBox(vec2(normi, 1-normj)))
 					points.push_back(v);
 				else
 					delete v;
@@ -96,7 +96,7 @@ void display()
   glEnd();
 
   glColor3f(1, 0, 0);
-  if (g_mesh == nullptr){
+  if (g_mesh == nullptr) {
 	  qt->draw();
   }
   else
@@ -117,8 +117,7 @@ void reshape(GLsizei width, GLsizei height)
 
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
-  //gluOrtho2D(LEFT, RIGHT, BOTTOM, TOP);
-  gluOrtho2D(0.f, RIGHT, TOP, BOTTOM);
+  gluOrtho2D(0.f, RIGHT, BOTTOM, TOP);
 
   glutPostRedisplay();
 }
@@ -181,6 +180,14 @@ void key_press_special(int c, int, int)
   switch(c) {
   case GLUT_KEY_F1:
     balance_tree(qt);
+    break;
+  case GLUT_KEY_F2:
+    QuadTreeNode* node = qt->GetRoot()->GetChild(NE);
+    vector<QuadTreeNode*> test = get_nbrs_vertex(node, qt->GetLeaves(), 3);
+    for(size_t i = 0; i < test.size(); ++i) {
+      test[i]->SetColor(glm::vec3(0, 0, 1));
+    }
+
     break;
   }
 

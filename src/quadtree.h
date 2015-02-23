@@ -61,9 +61,16 @@ private:
 };
 
 bool pnpoly(glm::vec2, std::vector<glm::vec2>);
+
 void balance_tree(QuadTree*);
+
 std::vector<QuadTreeNode*> get_populated_leaves(QuadTree* qt, int level = -1);
+
 std::vector<QuadTreeNode*> get_first_nbrs(QuadTreeNode* node,
                                           std::vector<QuadTreeNode*> leaves);
+
+std::vector<QuadTreeNode*> get_nbrs_vertex(QuadTreeNode* node,
+                                           std::vector<QuadTreeNode*> leaves,
+                                           int vertex_idx);
 
 #endif // QUADTREE_H

@@ -163,7 +163,7 @@ bool leaf_numpoints_comp(QuadTreeNode* a, QuadTreeNode* b)
   return a->GetNumPoints() > b->GetNumPoints();
 }
 
-std::vector<QuadTreeNode*> get_populated_leaves(QuadTree* qt, int level)
+vector<QuadTreeNode*> get_populated_leaves(QuadTree* qt, int level)
 {
   vector<QuadTreeNode*> leaves;
 
@@ -200,8 +200,8 @@ bool pnpoly(glm::vec2 point, std::vector<glm::vec2> hull_vertices)
   return c;
 }
 
-std::vector<QuadTreeNode*> get_first_nbrs(QuadTreeNode* node,
-                                          std::vector<QuadTreeNode*> leaves)
+vector<QuadTreeNode*> get_first_nbrs(QuadTreeNode* node,
+                                     vector<QuadTreeNode*> leaves)
 {
   vector<QuadTreeNode*> nbrs;
 
@@ -216,6 +216,32 @@ std::vector<QuadTreeNode*> get_first_nbrs(QuadTreeNode* node,
     BBox* leaf_box = leaves[i]->GetBBox();
     if(leaf_box->Intersect(*node_box))
       nbrs.push_back(leaves[i]);
+  }
+
+  return nbrs;
+}
+
+vector<QuadTreeNode*> get_nbrs_vertex(QuadTreeNode* node,
+                                      vector<QuadTreeNode*> leaves,
+                                      int vertex_idx)
+{
+  vector<QuadTreeNode*> nbrs;
+  if(node == nullptr || leaves.empty() || vertex_idx < 0 || vertex_idx > 3)
+    return nbrs;
+
+  vector<QuadTreeNode*> fst_nbrs = get_first_nbrs(node, leaves);
+  BBox* node_box = node->GetBBox();
+
+  for(auto it = fst_nbrs.begin(); it != fst_nbrs.end(); ++it) {
+    BBox* box = (*it)->GetBBox();
+    
+    for(int i = 0; i < 4; ++i) {
+      if(box->GetCorner(i) == node_box->GetCorner(vertex_idx)) {
+        nbrs.push_back(*it);
+        break;
+      }
+    }
+
   }
 
   return nbrs;
