@@ -46,9 +46,9 @@ vector<QuadTreeNode*> queue_in_leaves(vector<QuadTreeNode*> leaves,
   return in_leaves;
 }
 
-void Mesh::SetBaseMesh(vector<Vertex*> domain)
+void Mesh::SetBaseMesh(vector<vec2*> domain)
 {
-  vector<QuadTreeNode*> leaves = m_tree->GetLeaves();
+  /*vector<QuadTreeNode*> leaves = m_tree->GetLeaves();
   vector<vec2> domain_vec(domain.size());
 
   size_t d_sz = domain.size();
@@ -68,16 +68,16 @@ void Mesh::SetBaseMesh(vector<Vertex*> domain)
     Vertex* v1 = m_vertices[m_vertices.size() - 4];
     Vertex* v2 = m_vertices[m_vertices.size() - 3];
     Vertex* v3 = m_vertices[m_vertices.size() - 2];
-    Vertex* v4 = m_vertices[m_vertices.size() - 1];
+    Vertex* v4 = m_vertices[m_vertices.size() - 1];*/
 
-    m_edges.push_back(new Edge(v1, v2));
+    /*m_edges.push_back(new Edge(v1, v2));
     m_edges.push_back(new Edge(v2, v4));
     m_edges.push_back(new Edge(v4, v1));
 
     m_edges.push_back(new Edge(v2, v3));
     m_edges.push_back(new Edge(v3, v4));
     m_edges.push_back(new Edge(v4, v2));
-  }
+  }*/
 }
 
 void Mesh::Triangulate()
@@ -91,11 +91,11 @@ void Mesh::draw()
   size_t v_sz = m_vertices.size();
   for(size_t i = 0; i < v_sz; ++i) {
     glBegin(GL_POINTS);
-      glVertex2f(m_vertices[i]->p.x, m_vertices[i]->p.y);
+      glVertex2f(m_vertices[i]->x, m_vertices[i]->y);
     glEnd();
   }
 
-  glColor3f(1, 0, 0);
+  /*glColor3f(1, 0, 0);
   size_t e_sz = m_edges.size();
   for(size_t i = 0; i < e_sz; ++i) {
     Vertex* u = m_edges[i]->u;
@@ -104,51 +104,5 @@ void Mesh::draw()
       glVertex2f(u->p.x, u->p.y);
       glVertex2f(v->p.x, v->p.y);
     glEnd();
-  }
+  }*/
 }
-
-//bool vec_comp(Vertex a, Vertex b)
-//{
-//  return a.p.x < b.p.x;
-//}
-//
-//void SetVertices(QuadTree* qt)
-//{
-//  if(!qt) return;
-//
-//  vector<QuadTreeNode*> leaves = qt->GetLeaves();
-//  size_t l_sz = leaves.size();
-//
-//  set<Vertex, bool(*)(Vertex, Vertex)> v_set(vec_comp);
-//  for(size_t i = 0; i < l_sz; ++i) {
-//    BBox* box = leaves[i]->GetBBox();
-//
-//    for(int j = 0; j < 4; ++j) {
-//      Edge e;
-//      Vertex a(box->GetCorner(j));
-//    }
-//
-//    v_set.insert(box->GetCorner(0));
-//    v_set.insert(box->GetCorner(1));
-//    v_set.insert(box->GetCorner(2));
-//    v_set.insert(box->GetCorner(3));
-//  }
-//
-//  cout << v_set.size() << endl;
-//}
-//
-//void InclusionTest(std::vector<glm::vec2> domain)
-//{
-//  if(m_vertices.empty() || domain.empty())
-//    return;
-//
-//  vector<Vertex> in_vertices;
-//
-//  size_t v_sz = m_vertices.size();
-//  for(size_t i = 0; i < v_sz; ++i)
-//    if(pnpoly(m_vertices[i].p, domain))
-//      in_vertices.push_back(m_vertices[i]);
-//
-//  m_vertices.clear();
-//  m_vertices = in_vertices;
-//}

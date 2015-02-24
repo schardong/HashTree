@@ -9,7 +9,7 @@
 using namespace std;
 using namespace glm;
 
-QuadTree::QuadTree(BBox* bbox, size_t num_points_node, int max_depth, std::vector<Vertex*> p) :
+QuadTree::QuadTree(BBox* bbox, size_t num_points_node, int max_depth, std::vector<glm::vec2*> p) :
   m_num_points(0),
   m_depth(0),
   m_max_depth(max_depth),
@@ -25,7 +25,7 @@ QuadTree::~QuadTree()
   m_root_node = nullptr;
 }
 
-bool QuadTree::AddPoint(Vertex* p)
+bool QuadTree::AddPoint(glm::vec2* p)
 {
   int r_depth = m_root_node->AddPoint(p);
   if(r_depth == -1)
@@ -35,7 +35,7 @@ bool QuadTree::AddPoint(Vertex* p)
   return true;
 }
 
-std::vector<Vertex*> QuadTree::GetPointsInRange(BBox *range)
+std::vector<glm::vec2*> QuadTree::GetPointsInRange(BBox *range)
 {
   return m_root_node->GetPointsInRange(range);
 }

@@ -5,7 +5,6 @@
 #include <glm/glm.hpp>
 
 #include "quadtreenode.h"
-#include "edge.h"
 
 class QuadTree
 {
@@ -13,12 +12,12 @@ public:
   QuadTree(BBox *bbox,
     size_t num_points_node = 64,
     int max_depth = -1,
-    std::vector<Vertex*> p = std::vector<Vertex*>());
+    std::vector<glm::vec2*> p = std::vector<glm::vec2*>());
 
   virtual ~QuadTree();
 
-  virtual bool AddPoint(Vertex* p);
-  virtual std::vector<Vertex*> GetPointsInRange(BBox* range);
+  virtual bool AddPoint(glm::vec2* p);
+  virtual std::vector<glm::vec2*> GetPointsInRange(BBox* range);
   std::vector<QuadTreeNode*> GetLeaves(int level = -1);
   std::vector<QuadTreeNode*> GetUnconformingLeaves(int level);
   std::vector<QuadTreeNode*> GetAllNodes();

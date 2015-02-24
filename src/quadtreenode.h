@@ -41,13 +41,13 @@ public:
                size_t max_npoints = 64,
                int max_depth = -1,
                NODE_TYPE nt = ROOT,
-               std::vector<Vertex*> p = std::vector<Vertex*>(),
+               std::vector<glm::vec2*> p = std::vector<glm::vec2*>(),
                glm::vec3 color = glm::vec3(1, 0, 0));
 
   virtual ~QuadTreeNode();
   virtual void Split(PATTERN_TYPE tp = NO_PAT);
-  virtual int AddPoint(Vertex* p);
-  virtual std::vector<Vertex*> GetPointsInRange(BBox* range);
+  virtual int AddPoint(glm::vec2* p);
+  virtual std::vector<glm::vec2*> GetPointsInRange(BBox* range);
   QuadTreeNode* FindNeighbor(NBR_DIR dir);
   void draw();
 
@@ -71,7 +71,7 @@ public:
     return m_max_depth;
   }
 
-  Vertex* GetVertex(size_t i)
+  glm::vec2* GetVertex(size_t i)
   {
     assert(i < m_points.size());
     return m_points[i];
@@ -143,7 +143,7 @@ private:
   NODE_TYPE m_node_type;
   QuadTreeNode* m_children[4];
   QuadTreeNode* m_parent;
-  std::vector<Vertex*> m_points;
+  std::vector<glm::vec2*> m_points;
   glm::vec3 m_color;
   bool m_degenerated;
 

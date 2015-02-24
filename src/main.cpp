@@ -24,8 +24,7 @@ static int win_id = -1;
 QuadTree* qt = nullptr;
 Mesh* g_mesh = nullptr;
 
-vector<Vertex*> points;
-vector<Edge*> edges;
+vector<vec2*> g_vertices;
 
 #define LEFT 0.0001f
 #define RIGHT 1.f
@@ -44,21 +43,21 @@ void createTree()
 	int h = image.height();
 	for (int i = 0; i < w; i++){
 		for (int j = 0; j < h; j++){
-			if (image(i, j) == 0){ //black points
+			if (image(i, j) == 0){ //black g_vertices
 				float normi = (float)i / w;
 				float normj = (float)j / h;
-				Vertex* v = new Vertex(vec2(normi, 1-normj));
-				if (r0->PointInBox(vec2(normi, 1-normj)))
-					points.push_back(v);
+				vec2* v = new vec2(normi, 1-normj);
+				if (r0->PointInBox(*v))
+					g_vertices.push_back(v);
 				else
 					delete v;
 			}
 		}
 	}
 
-  qt = new QuadTree(r0, 10, 4);//, -1, points);
-  for(size_t i = 0; i < points.size(); ++i)
-    qt->AddPoint(points[i]);
+  qt = new QuadTree(r0, 10, 4);//, -1, g_vertices);
+  for(size_t i = 0; i < g_vertices.size(); ++i)
+    qt->AddPoint(g_vertices[i]);
 
 }
 
@@ -82,17 +81,8 @@ void display()
 
   glColor3f(0, 1, 0);
   glBegin(GL_POINTS);
-  for(size_t i = 0; i < points.size(); ++i)
-    glVertex2f(points[i]->p.x, points[i]->p.y);
-  glEnd();
-
-  glColor3f(0, 1, 1);
-
-  glBegin(GL_LINES);
-  for(size_t i = 0; i < edges.size(); ++i) {
-    glVertex2f(edges[i]->u->p.x, edges[i]->u->p.y);
-    glVertex2f(edges[i]->v->p.x, edges[i]->v->p.y);
-  }
+  for(size_t i = 0; i < g_vertices.size(); ++i)
+    glVertex2f(g_vertices[i]->x, g_vertices[i]->y);
   glEnd();
 
   glColor3f(1, 0, 0);
@@ -129,9 +119,11 @@ void mouse_click(int button, int state, int x, int y)
     {
     case GLUT_LEFT_BUTTON:
     default:
-      Vertex* v = new Vertex(vec2(x / (float)WIN_WIDTH, y / (float)WIN_HEIGHT));
+      vec2* v = new vec2(x / (float)WIN_WIDTH, 1.f - y / (float)WIN_HEIGHT);
       if(qt->AddPoint(v))
-        points.push_back(v);
+        g_vertices.push_back(v);
+      else
+        delete v;
       break;
     }
   }
@@ -149,20 +141,13 @@ void key_press(unsigned char c, int, int)
     delete qt;
     qt = nullptr;
 
-    for(size_t i = 0; i < points.size(); ++i) {
-      memset(points[i], 0, sizeof(Vertex));
-      delete points[i];
-      points[i] = nullptr;
+    for(size_t i = 0; i < g_vertices.size(); ++i) {
+      memset(g_vertices[i], 0, sizeof(vec2));
+      delete g_vertices[i];
+      g_vertices[i] = nullptr;
     }
 
-    for(size_t i = 0; i < edges.size(); ++i) {
-      memset(edges[i], 0, sizeof(Edge));
-      delete edges[i];
-      edges[i] = nullptr;
-    }
-
-    points.clear();
-    edges.clear();
+    g_vertices.clear();
 
     exit(0);
     break;
