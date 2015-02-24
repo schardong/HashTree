@@ -9,7 +9,6 @@
 #include <GL/glut.h>
 
 #include "quadtree.h"
-#include "edge.h"
 #include "mesh.h"
 #include "CImg.h"
 

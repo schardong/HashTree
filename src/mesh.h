@@ -21,8 +21,10 @@ public:
 private:
   QuadTree* m_tree;
   glm::vec3 m_color;
-  std::vector<BBox*> m_faces;
+
   std::vector<glm::vec2*> m_vertices;
+  std::vector<int> m_edges;
+  std::vector<int> m_opposites;
 };
 
 #endif  // MESH_H

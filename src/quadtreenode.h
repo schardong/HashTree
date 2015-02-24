@@ -1,11 +1,10 @@
 #ifndef QUADTREENODE_H
 #define QUADTREENODE_H
 
-#include "bbox.h"
-#include "edge.h"
 #include <vector>
 #include <queue>
 #include <glm/glm.hpp>
+#include "bbox.h"
 
 enum NODE_TYPE
 {
