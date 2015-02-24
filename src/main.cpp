@@ -178,16 +178,22 @@ void key_press_special(int c, int, int)
   printf("%d %c\n", c, c);
 
   switch(c) {
+
   case GLUT_KEY_F1:
     balance_tree(qt);
     break;
+
   case GLUT_KEY_F2:
-    QuadTreeNode* node = qt->GetRoot()->GetChild(NE);
-    vector<QuadTreeNode*> test = get_nbrs_vertex(node, qt->GetAllNodes(), 0);
+    QuadTreeNode* node = qt->GetRoot()->GetChild(SW)->GetChild(SW);
+    //If you want all the neighbors of any level use this call.
+    //vector<QuadTreeNode*> test = get_nbrs_vertex(node, qt->GetAllNodes(), 2);
+    //Now, if you want only leaf nodes, use this call.
+    vector<QuadTreeNode*> test = get_nbrs_vertex(node, qt->GetLeaves(), 2);
     for(size_t i = 0; i < test.size(); ++i) {
       test[i]->SetColor(glm::vec3(0, 0, 1));
     }
 
+    cout << "Number of nodes that share this vertex: " << test.size() << endl;
     break;
   }
 

@@ -24,6 +24,15 @@ enum NBR_DIR
   W
 };
 
+enum PATTERN_TYPE
+{
+  PAT_CORNER_0,
+  PAT_CORNER_1,
+  PAT_CORNER_2,
+  PAT_CORNER_3,
+  NO_PAT
+};
+
 class QuadTreeNode
 {
 public:
@@ -36,7 +45,7 @@ public:
                glm::vec3 color = glm::vec3(1, 0, 0));
 
   virtual ~QuadTreeNode();
-  virtual void Split();
+  virtual void Split(PATTERN_TYPE tp = NO_PAT);
   virtual int AddPoint(Vertex* p);
   virtual std::vector<Vertex*> GetPointsInRange(BBox* range);
   QuadTreeNode* FindNeighbor(NBR_DIR dir);
@@ -129,13 +138,14 @@ private:
   size_t id;
   size_t m_max_points;
   int m_depth;
+  int m_max_depth;
   BBox* m_box;
   NODE_TYPE m_node_type;
-  int m_max_depth;
   QuadTreeNode* m_children[4];
   QuadTreeNode* m_parent;
-  glm::vec3 m_color;
   std::vector<Vertex*> m_points;
+  glm::vec3 m_color;
+  bool m_degenerated;
 
   QuadTreeNode* north_nbr(QuadTreeNode *node);
   QuadTreeNode* south_nbr(QuadTreeNode *node);

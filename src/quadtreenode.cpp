@@ -46,7 +46,7 @@ QuadTreeNode::~QuadTreeNode()
   m_parent = nullptr;
 }
 
-void QuadTreeNode::Split()
+void QuadTreeNode::Split(PATTERN_TYPE tp)
 {
   using namespace std;
   using namespace glm;
