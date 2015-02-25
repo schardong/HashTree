@@ -13,6 +13,8 @@
 
 -Fazer funcionar a adição dos pontos no construtor;
 
+-BUG: Corrigir o bug da profundidade da árvore.
+
 -Depois:
 --Criar uma malha com os vértices + arestas;
 ---Malha deve ser independente da árvore.
