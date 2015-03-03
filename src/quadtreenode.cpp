@@ -19,7 +19,7 @@ QuadTreeNode::QuadTreeNode(BBox* box,
                            size_t max_npoints,
                            int max_depth,
                            NODE_TYPE nt,
-                           std::vector<glm::vec2*> p,
+                           std::vector<vertex *> p,
                            glm::vec3 color) :
   m_box(box), m_max_depth(max_depth), m_node_type(nt), m_points(p), m_max_points(max_npoints)
 {
@@ -48,13 +48,15 @@ QuadTreeNode::~QuadTreeNode()
 
 void QuadTreeNode::Split(PATTERN_TYPE tp)
 {
+  //Instead of creating new vertices for the children's boxes, use the existing ones
+  //and create only the ones that don't exist yet.
   using namespace std;
   using namespace glm;
 
   if(!IsLeaf())
     return;
 
-  vector<vec2*> p_quads[4];
+  vector<vertex*> p_quads[4];
   array<BBox*, 4> bbox_quads;
   BBox* box = (BBox*) m_box;
 
@@ -76,7 +78,7 @@ void QuadTreeNode::Split(PATTERN_TYPE tp)
 
   for(auto it = m_points.begin(); it != m_points.end(); ++it) {
     for(size_t i = 0; i < 4; ++i) {
-      if(bbox_quads[i]->PointInBox(*(*it))) {
+      if(bbox_quads[i]->PointInBox((*it)->GetCoord())) {
         p_quads[i].push_back(*it);
         break;
       }
@@ -91,9 +93,9 @@ void QuadTreeNode::Split(PATTERN_TYPE tp)
   m_points.clear();
 }
 
-int QuadTreeNode::AddPoint(glm::vec2* p)
+int QuadTreeNode::AddPoint(vertex *p)
 {
-  if(!m_box->PointInBox(*p))
+  if(!m_box->PointInBox(p->GetCoord()))
     return -1;
 
   if(IsLeaf()) {
@@ -121,7 +123,7 @@ int QuadTreeNode::AddPoint(glm::vec2* p)
   //The resulting depth is returned.
   int res_depth = GetDepth();
   for(size_t i = 0; i < 4; ++i) {
-    if(m_children[i]->GetBBox()->PointInBox(*p)) {
+    if(m_children[i]->GetBBox()->PointInBox(p->GetCoord())) {
       int d = m_children[i]->AddPoint(p);
       res_depth = d > res_depth? d : res_depth;
     }
@@ -130,25 +132,25 @@ int QuadTreeNode::AddPoint(glm::vec2* p)
   return res_depth;
 }
 
-std::vector<glm::vec2*> QuadTreeNode::GetPointsInRange(BBox* range)
+std::vector<vertex *> QuadTreeNode::GetPointsInRange(BBox* range)
 {
   using std::vector;
   using glm::vec2;
 
-  vector<glm::vec2*> p_range;
+  vector<vertex*> p_range;
 
   if(!range->Intersect(*GetBBox()))
     return p_range;
 
   if(IsLeaf()) {
     for(auto it = m_points.begin(); it != m_points.end(); it++)
-      if(range->PointInBox(*(*it)))
+      if(range->PointInBox((*it)->GetCoord()))
         p_range.push_back(*it);
     return p_range;
   }
 
   for(size_t i = 0; i < 4; ++i) {
-    vector<glm::vec2*> tmp = m_children[i]->GetPointsInRange(range);
+    vector<vertex*> tmp = m_children[i]->GetPointsInRange(range);
     if(!tmp.empty())
       p_range.insert(p_range.end(), tmp.begin(), tmp.end());
   }

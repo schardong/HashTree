@@ -23,7 +23,7 @@ static int win_id = -1;
 QuadTree* qt = nullptr;
 Mesh* g_mesh = nullptr;
 
-vector<vec2*> g_vertices;
+vector<vertex*> g_vertices;
 
 #define LEFT 0.0001f
 #define RIGHT 1.f
@@ -32,7 +32,10 @@ vector<vec2*> g_vertices;
 
 void createTree()
 {
-	array<vec2, 4> v0 = { vec2(LEFT, BOTTOM), vec2(RIGHT, BOTTOM), vec2(RIGHT, TOP), vec2(LEFT, TOP) };
+  array<vertex, 4> v0 = { vertex(vec2(LEFT, BOTTOM)),
+                          vertex(vec2(RIGHT, BOTTOM)),
+                          vertex(vec2(RIGHT, TOP)),
+                          vertex(vec2(LEFT, TOP)) };
 	BBox* r0 = new BBox(v0);
 
 	//AXELLE
@@ -45,8 +48,8 @@ void createTree()
 			if (image(i, j) == 0){ //black g_vertices
 				float normi = (float)i / w;
 				float normj = (float)j / h;
-				vec2* v = new vec2(normi, 1-normj);
-				if (r0->PointInBox(*v))
+        vertex* v = new vertex(vec2(normi, 1-normj));
+        if (r0->PointInBox(v->GetCoord()))
 					g_vertices.push_back(v);
 				else
 					delete v;
@@ -81,7 +84,7 @@ void display()
   glColor3f(0, 1, 0);
   glBegin(GL_POINTS);
   for(size_t i = 0; i < g_vertices.size(); ++i)
-    glVertex2f(g_vertices[i]->x, g_vertices[i]->y);
+    glVertex2f(g_vertices[i]->GetCoord().x, g_vertices[i]->GetCoord().y);
   glEnd();
 
   glColor3f(1, 0, 0);
@@ -118,7 +121,7 @@ void mouse_click(int button, int state, int x, int y)
     {
     case GLUT_LEFT_BUTTON:
     default:
-      vec2* v = new vec2(x / (float)WIN_WIDTH, 1.f - y / (float)WIN_HEIGHT);
+      vertex* v = new vertex(vec2(x / (float)WIN_WIDTH, 1.f - y / (float)WIN_HEIGHT));
       if(qt->AddPoint(v))
         g_vertices.push_back(v);
       else

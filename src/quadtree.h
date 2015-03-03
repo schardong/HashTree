@@ -12,12 +12,12 @@ public:
   QuadTree(BBox *bbox,
     size_t num_points_node = 64,
     int max_depth = -1,
-    std::vector<glm::vec2*> p = std::vector<glm::vec2*>());
+    std::vector<vertex*> p = std::vector<vertex*>());
 
   virtual ~QuadTree();
 
-  virtual bool AddPoint(glm::vec2* p);
-  virtual std::vector<glm::vec2*> GetPointsInRange(BBox* range);
+  virtual bool AddPoint(vertex* p);
+  virtual std::vector<vertex*> GetPointsInRange(BBox* range);
   std::vector<QuadTreeNode*> GetLeaves(int level = -1);
   std::vector<QuadTreeNode*> GetUnconformingLeaves(int level);
   std::vector<QuadTreeNode*> GetAllNodes();
@@ -59,7 +59,7 @@ private:
   std::vector<QuadTreeNode*> get_leaves(int level);
 };
 
-bool pnpoly(glm::vec2, std::vector<glm::vec2>);
+bool pnpoly(vertex, std::vector<vertex>);
 
 void balance_tree(QuadTree*);
 

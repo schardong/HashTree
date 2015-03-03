@@ -26,22 +26,22 @@ vector<QuadTreeNode*> queue_in_leaves(vector<QuadTreeNode*> leaves,
 {
   vector<QuadTreeNode*> in_leaves;
 
-  if(leaves.empty() || domain.empty() || num_vertices_in <= 0 || num_vertices_in > 4)
-    return in_leaves;
+//  if(leaves.empty() || domain.empty() || num_vertices_in <= 0 || num_vertices_in > 4)
+//    return in_leaves;
 
-  size_t l_sz = leaves.size();
+//  size_t l_sz = leaves.size();
 
-  for(size_t i = 0; i < l_sz; ++i) {
-    BBox* bbox = leaves[i]->GetBBox();
+//  for(size_t i = 0; i < l_sz; ++i) {
+//    BBox* bbox = leaves[i]->GetBBox();
 
-    bool a = pnpoly(bbox->GetCorner(0), domain);
-    bool b = pnpoly(bbox->GetCorner(1), domain);
-    bool c = pnpoly(bbox->GetCorner(2), domain);
-    bool d = pnpoly(bbox->GetCorner(3), domain);
+//    bool a = pnpoly(bbox->GetCorner(0), domain);
+//    bool b = pnpoly(bbox->GetCorner(1), domain);
+//    bool c = pnpoly(bbox->GetCorner(2), domain);
+//    bool d = pnpoly(bbox->GetCorner(3), domain);
 
-    if((a + b + c + d) >= num_vertices_in)
-      in_leaves.push_back(leaves[i]);
-  }
+//    if((a + b + c + d) >= num_vertices_in)
+//      in_leaves.push_back(leaves[i]);
+//  }
 
   return in_leaves;
 }
@@ -87,13 +87,13 @@ void Mesh::Triangulate()
 
 void Mesh::draw()
 {
-  glColor3f(0, 1, 1);
-  size_t v_sz = m_vertices.size();
-  for(size_t i = 0; i < v_sz; ++i) {
-    glBegin(GL_POINTS);
-      glVertex2f(m_vertices[i]->x, m_vertices[i]->y);
-    glEnd();
-  }
+//  glColor3f(0, 1, 1);
+//  size_t v_sz = m_vertices.size();
+//  for(size_t i = 0; i < v_sz; ++i) {
+//    glBegin(GL_POINTS);
+//      glVertex2f(m_vertices[i]->x, m_vertices[i]->y);
+//    glEnd();
+//  }
 
   /*glColor3f(1, 0, 0);
   size_t e_sz = m_edges.size();
