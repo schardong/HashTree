@@ -4,12 +4,14 @@
 #include <vector>
 #include <glm/glm.hpp>
 
-#include "quadtreenode.h"
+class vertex;
+class QuadTreeNode;
+class BBox;
 
 class QuadTree
 {
 public:
-  QuadTree(BBox *bbox,
+  QuadTree(BBox* bbox,
     size_t num_points_node = 64,
     int max_depth = -1,
     std::vector<vertex*> p = std::vector<vertex*>());

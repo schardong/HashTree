@@ -9,7 +9,10 @@
 #include <GL/glut.h>
 
 #include "quadtree.h"
+#include "quadtreenode.h"
 #include "mesh.h"
+#include "vertex.h"
+#include "bbox.h"
 #include "CImg.h"
 
 using namespace std;
@@ -63,9 +66,43 @@ void createTree()
 
 }
 
+void createTestTree()
+{
+  array<vertex, 4> v0 = { vertex(vec2(LEFT, BOTTOM)),
+                          vertex(vec2(RIGHT, BOTTOM)),
+                          vertex(vec2(RIGHT, TOP)),
+                          vertex(vec2(LEFT, TOP)) };
+	BBox* r0 = new BBox(v0);
+
+  qt = new QuadTree(r0, 10, 4);//, -1, g_vertices);
+  qt->GetRoot()->Split();
+  qt->GetRoot()->GetChild(0)->Split();
+  //qt->GetRoot()->GetChild(1)->Split();
+  qt->GetRoot()->GetChild(0)->GetChild(3)->Split();
+
+  
+  map<int, int> shared_verts;
+  vector<QuadTreeNode*> leaves = qt->GetLeaves();
+  
+  for(int i = 0; i < leaves.size(); ++i) {
+    BBox* box = leaves[i]->GetBBox();
+
+    for(int j = 0; j < 4; ++j) {
+      int vid = box->GetCorner(j).GetId();
+      if(shared_verts.find(vid) == shared_verts.end())
+        shared_verts[vid] = 1;
+      else
+        shared_verts[vid]++;
+    }
+  }
+
+  printf("number of vertices: %d\n", shared_verts.size());
+}
+
 void initGL()
 {
-  createTree();
+  //createTree();
+  createTestTree();
   glEnable(GL_TEXTURE_2D);
   
   glClearColor(0.3f, 0.3f, 0.3f, 1.0f);

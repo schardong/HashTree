@@ -3,6 +3,8 @@
 
 #include <array>
 #include <GL/glut.h>
+#include <glm/glm.hpp>
+
 #include "vertex.h"
 
 class BBox

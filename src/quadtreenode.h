@@ -3,8 +3,10 @@
 
 #include <vector>
 #include <queue>
-#include "vertex.h"
-#include "bbox.h"
+#include <glm/glm.hpp>
+
+class vertex;
+class BBox;
 
 enum NODE_TYPE
 {

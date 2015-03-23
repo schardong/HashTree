@@ -1,10 +1,13 @@
-#include "quadtree.h"
-#include "quadtreenode.h"
 #include <iostream>
 #include <algorithm>
 #include <set>
 #include <cstdlib>
 #include <cstring>
+
+#include "quadtree.h"
+#include "quadtreenode.h"
+#include "bbox.h"
+#include "vertex.h"
 
 using namespace std;
 using namespace glm;

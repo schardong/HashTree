@@ -3,12 +3,16 @@
 #include <stack>
 #include <iostream>
 #include <GL/glut.h>
+
 #include "quadtreenode.h"
+#include "vertex.h"
+#include "bbox.h"
 
 static size_t g_quad_node_id = 0;
 
 QuadTreeNode::QuadTreeNode()
 {
+  id = g_quad_node_id++;
   m_max_points = 64;
   m_max_depth = -1;
   m_depth = 0;
@@ -59,22 +63,27 @@ void QuadTreeNode::Split(PATTERN_TYPE tp)
   vector<vertex*> p_quads[4];
   array<BBox*, 4> bbox_quads;
   BBox* box = (BBox*) m_box;
+  
+  vertex v0 = box->GetCorner(0);
+  vertex v1 = box->GetCorner(1);
+  vertex v2 = box->GetCorner(2);
+  vertex v3 = box->GetCorner(3);
 
-  vec2 e0_midp = 0.5f * (box->GetCorner(1) - box->GetCorner(0)) + box->GetCorner(0);
-  vec2 e1_midp = 0.5f * (box->GetCorner(2) - box->GetCorner(1)) + box->GetCorner(1);
-  vec2 e2_midp = 0.5f * (box->GetCorner(3) - box->GetCorner(2)) + box->GetCorner(2);
-  vec2 e3_midp = 0.5f * (box->GetCorner(0) - box->GetCorner(3)) + box->GetCorner(3);
-  vec2 midd = 0.5f * (box->GetCorner(2) - box->GetCorner(0)) + box->GetCorner(0);
+  vertex e0_midp = vertex(0.5f * (v1.GetCoord() - v0.GetCoord()) + v0.GetCoord());
+  vertex e1_midp = vertex(0.5f * (v2.GetCoord() - v1.GetCoord()) + v1.GetCoord());
+  vertex e2_midp = vertex(0.5f * (v3.GetCoord() - v2.GetCoord()) + v2.GetCoord());
+  vertex e3_midp = vertex(0.5f * (v0.GetCoord() - v3.GetCoord()) + v3.GetCoord());
+  vertex midd = vertex(0.5f * (v2.GetCoord() - v0.GetCoord()) + v0.GetCoord());
 
-  array<vec2, 4> v0 = {box->GetCorner(0), e0_midp, midd, e3_midp};
-  array<vec2, 4> v1 = {e0_midp, box->GetCorner(1), e1_midp, midd};
-  array<vec2, 4> v2 = {e3_midp, midd, e2_midp, box->GetCorner(3)};
-  array<vec2, 4> v3 = {midd, e1_midp, box->GetCorner(2), e2_midp};
+  array<vertex, 4> vv0 = {v0, e0_midp, midd, e3_midp};
+  array<vertex, 4> vv1 = {e0_midp, v1, e1_midp, midd};
+  array<vertex, 4> vv2 = {e3_midp, midd, e2_midp, v3};
+  array<vertex, 4> vv3 = {midd, e1_midp, v2, e2_midp};
 
-  bbox_quads[SW] = new BBox(v0);
-  bbox_quads[SE] = new BBox(v1);
-  bbox_quads[NW] = new BBox(v2);
-  bbox_quads[NE] = new BBox(v3);
+  bbox_quads[SW] = new BBox(vv0);
+  bbox_quads[SE] = new BBox(vv1);
+  bbox_quads[NW] = new BBox(vv2);
+  bbox_quads[NE] = new BBox(vv3);
 
   for(auto it = m_points.begin(); it != m_points.end(); ++it) {
     for(size_t i = 0; i < 4; ++i) {
