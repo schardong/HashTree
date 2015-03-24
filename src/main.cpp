@@ -64,6 +64,7 @@ void createTree()
   for(size_t i = 0; i < g_vertices.size(); ++i)
     qt->AddPoint(g_vertices[i]);
 
+  g_mesh = new Mesh(qt);
 }
 
 void createTestTree()
@@ -80,38 +81,22 @@ void createTestTree()
   //qt->GetRoot()->GetChild(1)->Split();
   qt->GetRoot()->GetChild(0)->GetChild(3)->Split();
 
-  
-  map<int, int> shared_verts;
-  vector<QuadTreeNode*> leaves = qt->GetLeaves();
-  
-  for(int i = 0; i < leaves.size(); ++i) {
-    BBox* box = leaves[i]->GetBBox();
-
-    for(int j = 0; j < 4; ++j) {
-      int vid = box->GetCorner(j).GetId();
-      if(shared_verts.find(vid) == shared_verts.end())
-        shared_verts[vid] = 1;
-      else
-        shared_verts[vid]++;
-    }
-  }
-
-  printf("number of vertices: %d\n", shared_verts.size());
+  g_mesh = new Mesh(qt);
 }
 
 void initGL()
 {
-  //createTree();
-  createTestTree();
+  createTree();
+  //createTestTree();
   glEnable(GL_TEXTURE_2D);
   
   glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
   glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
   glMatrixMode(GL_MODELVIEW);
-  
   glLoadIdentity();
-  glPointSize(1);
+
+  glPointSize(1.f);
 }
 
 void display()
@@ -125,9 +110,9 @@ void display()
   glEnd();
 
   glColor3f(1, 0, 0);
-  if (g_mesh == nullptr) {
+
+  if(g_mesh == nullptr)
 	  qt->draw();
-  }
   else
 	  g_mesh->draw();
 
@@ -146,7 +131,7 @@ void reshape(GLsizei width, GLsizei height)
 
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
-  gluOrtho2D(0.f, RIGHT, BOTTOM, TOP);
+  gluOrtho2D(0.f, RIGHT, 0.f, TOP);
 
   glutPostRedisplay();
 }

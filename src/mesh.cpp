@@ -1,11 +1,14 @@
 #include <iostream>
 #include <vector>
-#include <set>
+#include <map>
 #include <GL/glut.h>
+#include <glm/glm.hpp>
+
 #include "mesh.h"
+#include "vertex.h"
+#include "bbox.h"
 #include "quadtree.h"
 #include "quadtreenode.h"
-#include "glm/glm.hpp"
 
 using namespace std;
 using namespace glm;
@@ -13,87 +16,70 @@ using namespace glm;
 Mesh::Mesh(QuadTree* qt) :
   m_tree(qt)
 {
+  assert(qt != nullptr);
   m_color = vec3(0, 1, 1);
-}
 
+  map<int, vertex> shared_verts;
+  vector<int> tmp_edges;
+  vector<QuadTreeNode*> leaves = qt->GetLeaves();
+  
+  size_t i;
+  size_t l_sz = leaves.size();
+  for(i = 0; i < l_sz; ++i) {
+    BBox* box = leaves[i]->GetBBox();
+
+    for(int j = 0; j < 4; ++j) {
+      vertex v = box->GetCorner(j);
+      int vid = v.GetId();
+      if(shared_verts.find(vid) == shared_verts.end())
+        shared_verts[vid] = v;
+
+      tmp_edges.push_back(vid);
+    }
+  }
+
+  m_vertices.resize(shared_verts.size());
+  i = 0;
+  for(auto it = shared_verts.begin(); it != shared_verts.end(); ++it, ++i)
+    m_vertices[i] = it->second;
+
+  size_t v_sz = m_vertices.size();
+  size_t te_sz = tmp_edges.size();
+  m_edges.resize(te_sz);
+  for(size_t j = 0; j < te_sz; ++j) {
+    for(i = 0; i < v_sz; ++i) {
+      if(tmp_edges[j] == m_vertices[i].GetId())
+        break;
+    }
+    m_edges[j] = i;
+  }
+
+  printf("number of vertices: %d\n", shared_verts.size());
+}
 
 Mesh::~Mesh()
 {}
 
-vector<QuadTreeNode*> queue_in_leaves(vector<QuadTreeNode*> leaves,
-                                      vector<vec2> domain,
-                                      int num_vertices_in)
-{
-  vector<QuadTreeNode*> in_leaves;
-
-//  if(leaves.empty() || domain.empty() || num_vertices_in <= 0 || num_vertices_in > 4)
-//    return in_leaves;
-
-//  size_t l_sz = leaves.size();
-
-//  for(size_t i = 0; i < l_sz; ++i) {
-//    BBox* bbox = leaves[i]->GetBBox();
-
-//    bool a = pnpoly(bbox->GetCorner(0), domain);
-//    bool b = pnpoly(bbox->GetCorner(1), domain);
-//    bool c = pnpoly(bbox->GetCorner(2), domain);
-//    bool d = pnpoly(bbox->GetCorner(3), domain);
-
-//    if((a + b + c + d) >= num_vertices_in)
-//      in_leaves.push_back(leaves[i]);
-//  }
-
-  return in_leaves;
-}
-
-void Mesh::SetBaseMesh(vector<vec2*> domain)
-{
-  /*vector<QuadTreeNode*> leaves = m_tree->GetLeaves();
-  vector<vec2> domain_vec(domain.size());
-
-  size_t d_sz = domain.size();
-  for(size_t i = 0; i < d_sz; ++i)
-    domain_vec[i] = domain[i]->p;
-
-  leaves = queue_in_leaves(leaves, domain_vec, 4);
-
-  size_t l_sz = leaves.size();
-  for(size_t i = 0; i < l_sz; ++i) {
-    BBox* box = leaves[i]->GetBBox();
-    m_faces.push_back(box);
-
-    for(size_t j = 0; j < 4; ++j)
-      m_vertices.push_back(new Vertex(box->GetCorner(j)));
-
-    Vertex* v1 = m_vertices[m_vertices.size() - 4];
-    Vertex* v2 = m_vertices[m_vertices.size() - 3];
-    Vertex* v3 = m_vertices[m_vertices.size() - 2];
-    Vertex* v4 = m_vertices[m_vertices.size() - 1];*/
-
-    /*m_edges.push_back(new Edge(v1, v2));
-    m_edges.push_back(new Edge(v2, v4));
-    m_edges.push_back(new Edge(v4, v1));
-
-    m_edges.push_back(new Edge(v2, v3));
-    m_edges.push_back(new Edge(v3, v4));
-    m_edges.push_back(new Edge(v4, v2));
-  }*/
-}
-
-void Mesh::Triangulate()
-{
-
-}
-
 void Mesh::draw()
 {
-//  glColor3f(0, 1, 1);
-//  size_t v_sz = m_vertices.size();
-//  for(size_t i = 0; i < v_sz; ++i) {
-//    glBegin(GL_POINTS);
-//      glVertex2f(m_vertices[i]->x, m_vertices[i]->y);
-//    glEnd();
-//  }
+  glColor3f(0, 1, 1);
+  /*size_t v_sz = m_vertices.size();
+  for(size_t i = 0; i < v_sz; ++i) {
+    glBegin(GL_POINTS);
+    glVertex2f(m_vertices[i].GetCoord().x, m_vertices[i].GetCoord().y);
+    glEnd();
+  }*/
+
+
+  size_t e_sz = m_edges.size();
+  for(size_t i = 0; i < e_sz; ++i) {
+    vertex u = m_vertices[m_edges[i]];
+    vertex v = m_vertices[m_edges[next_edge(i)]];
+    glBegin(GL_LINES);
+      glVertex2f(u.GetCoord().x, u.GetCoord().y);
+      glVertex2f(v.GetCoord().x, v.GetCoord().y);
+    glEnd();
+  }
 
   /*glColor3f(1, 0, 0);
   size_t e_sz = m_edges.size();
