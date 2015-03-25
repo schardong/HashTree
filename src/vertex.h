@@ -11,6 +11,7 @@ private:
 
 public:
   vertex(glm::vec2 p = glm::vec2(0));
+  vertex(vertex& rhs);
   ~vertex();
 
   int GetId()

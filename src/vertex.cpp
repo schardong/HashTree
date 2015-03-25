@@ -8,6 +8,12 @@ vertex::vertex(glm::vec2 p) :
   m_id = g_curr_vertex_id++;
 }
 
+vertex::vertex(vertex& rhs)
+{
+  m_id = rhs.GetId();
+  m_coord = rhs.GetCoord();
+}
+
 vertex::~vertex()
 {
   m_id = -1;

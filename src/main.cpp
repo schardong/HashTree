@@ -60,7 +60,7 @@ void createTree()
 		}
 	}
 
-  qt = new QuadTree(r0, 10, 6);//, -1, g_vertices);
+  qt = new QuadTree(r0, 10, 4);//, -1, g_vertices);
   for(size_t i = 0; i < g_vertices.size(); ++i)
     qt->AddPoint(g_vertices[i]);
 
