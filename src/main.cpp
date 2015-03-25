@@ -60,26 +60,9 @@ void createTree()
 		}
 	}
 
-  qt = new QuadTree(r0, 10, 4);//, -1, g_vertices);
+  qt = new QuadTree(r0, 10, 6);//, -1, g_vertices);
   for(size_t i = 0; i < g_vertices.size(); ++i)
     qt->AddPoint(g_vertices[i]);
-
-  g_mesh = new Mesh(qt);
-}
-
-void createTestTree()
-{
-  array<vertex, 4> v0 = { vertex(vec2(LEFT, BOTTOM)),
-                          vertex(vec2(RIGHT, BOTTOM)),
-                          vertex(vec2(RIGHT, TOP)),
-                          vertex(vec2(LEFT, TOP)) };
-	BBox* r0 = new BBox(v0);
-
-  qt = new QuadTree(r0, 10, 4);//, -1, g_vertices);
-  qt->GetRoot()->Split();
-  qt->GetRoot()->GetChild(0)->Split();
-  //qt->GetRoot()->GetChild(1)->Split();
-  qt->GetRoot()->GetChild(0)->GetChild(3)->Split();
 
   g_mesh = new Mesh(qt);
 }
@@ -87,7 +70,6 @@ void createTestTree()
 void initGL()
 {
   createTree();
-  //createTestTree();
   glEnable(GL_TEXTURE_2D);
   
   glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
@@ -114,7 +96,7 @@ void display()
   if(g_mesh == nullptr)
 	  qt->draw();
   else
-	  g_mesh->draw();
+	  g_mesh->Draw();
 
   glutSwapBuffers();
 }
@@ -162,8 +144,12 @@ void key_press(unsigned char c, int, int)
   switch(c) {
   case 27: //ESC
     glutDestroyWindow(win_id);
+
     delete qt;
     qt = nullptr;
+
+    delete g_mesh;
+    g_mesh = nullptr;
 
     for(size_t i = 0; i < g_vertices.size(); ++i) {
       memset(g_vertices[i], 0, sizeof(vec2));
@@ -191,8 +177,10 @@ void key_press_special(int c, int, int)
   case GLUT_KEY_F1:
     balance_tree(qt);
     break;
-
   case GLUT_KEY_F2:
+    g_mesh->buildGeometry(qt);
+    break;
+  case GLUT_KEY_F3:
     QuadTreeNode* node = qt->GetRoot()->GetChild(SW)->GetChild(SW);
     //If you want all the neighbors of any level use this call.
     //vector<QuadTreeNode*> test = get_nbrs_vertex(node, qt->GetAllNodes(), 2);
