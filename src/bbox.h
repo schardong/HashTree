@@ -49,7 +49,7 @@ public:
     return m_corners[i];
   }
 
-  void draw()
+  void Draw()
   {
     glBegin(GL_QUADS);
       glVertex2f(m_corners[0].GetCoord().x, m_corners[0].GetCoord().y);

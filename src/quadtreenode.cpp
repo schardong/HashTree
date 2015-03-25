@@ -167,15 +167,15 @@ std::vector<vertex *> QuadTreeNode::GetPointsInRange(BBox* range)
   return p_range;
 }
 
-void QuadTreeNode::draw()
+void QuadTreeNode::Draw()
 {
   glColor3f(m_color.r, m_color.g, m_color.b);
-  m_box->draw();
+  m_box->Draw();
 
   if(!IsLeaf())
     for(int i = 0; i < 4; ++i)
       if(m_children[i])
-        m_children[i]->draw();
+        m_children[i]->Draw();
 }
 
 QuadTreeNode* QuadTreeNode::FindNeighbor(NBR_DIR dir)

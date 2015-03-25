@@ -94,7 +94,7 @@ void display()
   glColor3f(1, 0, 0);
 
   if(g_mesh == nullptr)
-	  qt->draw();
+	  qt->Draw();
   else
 	  g_mesh->Draw();
 
@@ -178,7 +178,7 @@ void key_press_special(int c, int, int)
     balance_tree(qt);
     break;
   case GLUT_KEY_F2:
-    g_mesh->buildGeometry(qt);
+    g_mesh->BuildGeometry(qt);
     break;
   case GLUT_KEY_F3:
     QuadTreeNode* node = qt->GetRoot()->GetChild(SW)->GetChild(SW);

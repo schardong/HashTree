@@ -50,7 +50,7 @@ public:
   virtual int AddPoint(vertex* p);
   virtual std::vector<vertex*> GetPointsInRange(BBox* range);
   QuadTreeNode* FindNeighbor(NBR_DIR dir);
-  void draw();
+  void Draw();
 
   virtual bool IsLeaf()
   {

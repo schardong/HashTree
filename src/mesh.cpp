@@ -39,7 +39,7 @@ void Mesh::BuildGeometry(QuadTree* qt)
   build_opp_container();
 }
 
-void Mesh::draw()
+void Mesh::Draw()
 {
   glColor3f(m_color.r, m_color.g, m_color.b);
 

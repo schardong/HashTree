@@ -23,7 +23,7 @@ public:
   std::vector<QuadTreeNode*> GetLeaves(int level = -1);
   std::vector<QuadTreeNode*> GetUnconformingLeaves(int level);
   std::vector<QuadTreeNode*> GetAllNodes();
-  void draw();
+  void Draw();
 
   size_t GetMaxPointsNode()
   {

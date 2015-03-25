@@ -43,9 +43,9 @@ std::vector<vertex *> QuadTree::GetPointsInRange(BBox *range)
   return m_root_node->GetPointsInRange(range);
 }
 
-void QuadTree::draw()
+void QuadTree::Draw()
 {
-  m_root_node->draw();
+  m_root_node->Draw();
 }
 
 std::vector<QuadTreeNode*> QuadTree::GetLeaves(int level)
@@ -218,11 +218,11 @@ bool pnpoly(vertex point, std::vector<vertex> hull_vertices)
   int i, j, nvert = hull_vertices.size();
   bool c = false;
 
-//  for(i = 0, j = nvert - 1; i < nvert; j = i++)
-//    if(((hull_vertices[i].y >= point.y) != (hull_vertices[j].y >= point.y)) &&
-//        (point.x <= (hull_vertices[j].x - hull_vertices[i].x) * (point.y - hull_vertices[i].y) / (hull_vertices[j].y - hull_vertices[i].y) + hull_vertices[i].x)
-//      )
-//      c = !c;
+  for(i = 0, j = nvert - 1; i < nvert; j = i++)
+    if(((hull_vertices[i].GetCoord().y >= point.GetCoord().y) != (hull_vertices[j].GetCoord().y >= point.GetCoord().y)) &&
+        (point.GetCoord().x <= (hull_vertices[j].GetCoord().x - hull_vertices[i].GetCoord().x) * (point.GetCoord().y - hull_vertices[i].GetCoord().y) / (hull_vertices[j].GetCoord().y - hull_vertices[i].GetCoord().y) + hull_vertices[i].GetCoord().x)
+      )
+      c = !c;
 
   return c;
 }
